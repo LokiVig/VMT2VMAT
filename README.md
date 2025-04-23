@@ -4,7 +4,7 @@ It will utilize VTFEdit to automatically turn its respective VTF files into the 
 
 ## How To Use
 Using CMD you can launch the provided executable file with specified arguments. \
-Those arguments are: \
+Those arguments are:
 - "-vtf" - Specifies the path to a valid VMT file.
 - "-vmat" - Specifies the path to the resulting VMAT file.
 - "-version" - Specifies which version of Source 2 we should translate to.
