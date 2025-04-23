@@ -63,17 +63,18 @@ public class Program
                 }
             }
 
+            // If we're specifying the file extension for our textures...
             if ( IsValidArg( args[i], "-textureextension" ) )
             {
-                if ( IsValidArg( args[i + 1], "tga" ) )
+                if ( IsValidArg( args[i + 1], "tga" ) ) // TGA
                 {
                     textureExtension = "tga";
                 }
-                else if ( IsValidArg( args[i + 1], "png" ) )
+                else if ( IsValidArg( args[i + 1], "png" ) ) // PNG
                 {
                     textureExtension = "png";
                 }
-                else if ( IsValidArg( args[i + 1], "jpg" ) || IsValidArg( args[i + 1], "jpeg" ) )
+                else if ( IsValidArg( args[i + 1], "jpg" ) || IsValidArg( args[i + 1], "jpeg" ) ) // JPG
                 {
                     textureExtension = "jpg";
                 }
@@ -109,7 +110,7 @@ public class Program
 
             // Write some information beforehand
             sw.WriteLine( "// THIS FILE WAS AUTOMATICALLY TRANSLATED THROUGH VMT2VMAT" );
-            sw.WriteLine( "// IF THERE IS ANY ISSUE; GO FUCK YOURSELF" );
+            sw.WriteLine( "// IF THERE IS ANY ISSUE; CONTACT LOKI" );
             sw.WriteLine( "" );
             sw.WriteLine( "Layer0" );
             sw.WriteLine( "{" );
@@ -173,12 +174,6 @@ public class Program
                             sw.WriteLine( $"\t{translatedValue} // {line.Remove( 0, 1 )}" );
                             Console.WriteLine( $"Translated keyword \"{line.Remove( 0, 1 )}\" to \"{translatedValue}\"" );
                             break;
-
-                        default:
-                            // If we don't know what to do with the keyword, just write it as is
-                            sw.WriteLine( $"// {line.Remove( 0, 1 )}" );
-                            Console.WriteLine( $"Unknown keyword \"{line.Remove( 0, 1 )}\"" );
-                            break;
                     }
                 }
                 else // Otherwise!
@@ -231,12 +226,12 @@ public class Program
                     // In HL:A it's known as "VR Complex"
                     default:
                     case Source2Version.HLA:
-                        vmatShader = "vr_complex";
+                        vmatShader = "vr_complex.vfx";
                         break;
 
                     // Last I checked, in CS2 it's known as "Complex"
                     case Source2Version.CS2:
-                        vmatShader = "complex";
+                        vmatShader = "complex.vfx";
                         break;
 
                     // In s&box it's also known as "Complex", but with extra information
