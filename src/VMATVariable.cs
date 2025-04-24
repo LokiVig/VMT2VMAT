@@ -23,6 +23,11 @@ public class VMATVariable
     public string comment;
 
     /// <summary>
+    /// The original VMT keyvalue for this variable.
+    /// </summary>
+    public string vmtKeyValue;
+
+    /// <summary>
     /// The type of variable this is.
     /// </summary>
     public VMATVariableType type;
