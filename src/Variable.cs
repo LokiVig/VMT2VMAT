@@ -4,7 +4,7 @@
 /// A valid VMAT variable.<br/>
 /// Holds a key, a value, and a possible comment.
 /// </summary>
-public class VMATVariable
+public class Variable
 {
     /// <summary>
     /// The keyword for this variable.<br/>
@@ -30,13 +30,13 @@ public class VMATVariable
     /// <summary>
     /// The type of variable this is.
     /// </summary>
-    public VMATVariableType type;
+    public VariableType type;
 }
 
 /// <summary>
 /// The different types of VMAT variables that are available to translate.
 /// </summary>
-public enum VMATVariableType
+public enum VariableType
 {
     /// <summary>
     /// Unknown, we don't know what this is.
@@ -77,6 +77,11 @@ public enum VMATVariableType
     /// The variable defines that we're using the default translucency solver.
     /// </summary>
     Translucency,
+
+    /// <summary>
+    /// The variable defines that we're using self-illum.
+    /// </summary>
+    SelfIllum,
 
     /// <summary>
     /// The variable is the color texture.

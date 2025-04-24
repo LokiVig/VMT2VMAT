@@ -32,7 +32,7 @@ public class Program
     /// <summary>
     /// The list of textures in this material.
     /// </summary>
-    private static List<VMATVariable> vmatVariables = new List<VMATVariable>();
+    private static List<Variable> vmatVariables = new List<Variable>();
 
     public static void Main(string[] args)
     {
@@ -156,19 +156,19 @@ public class Program
                 }
 
                 // If we haven't already translated the shader...
-                if (!vmatVariables.HasVariable(VMATVariableType.Shader))
+                if (!vmatVariables.HasVariable(VariableType.Shader))
                 {
                     // If we can translate the line as a shader...
                     if (TranslateShader(keyvalues[0], out string vmatShader))
                     {
                         // Add a shader to the list of variables in this VMAT
-                        vmatVariables.Add(new VMATVariable
+                        vmatVariables.Add(new Variable
                         {
                             key = "shader",
                             value = vmatShader,
                             comment = $"// {line}",
                             vmtKeyValue = keyvalues[0],
-                            type = VMATVariableType.Shader
+                            type = VariableType.Shader
                         });
 
                         // Skip to the next line
@@ -178,12 +178,12 @@ public class Program
                     {
                         // Write the issue and return
                         sw.WriteLine("// FAULT! SHADER FAILED TO TRANSLATE");
-                        break;
+                        return;
                     }
                 }
 
                 // If we can translate the current keyword...
-                if (TranslateKeyValue(keyvalues[0], out string key, out KeyValueType keyType, out VMATVariableType varType))
+                if (TranslateKeyValue(keyvalues[0], out string key, out KeyValueType keyType, out VariableType varType))
                 {
                     // Check against different types of values we have
 
@@ -192,7 +192,7 @@ public class Program
                     {
                         // If it's unknown...
                         case KeyValueType.Unknown:
-                            vmatVariables.Add(new VMATVariable
+                            vmatVariables.Add(new Variable
                             {
                                 key = string.Empty,
                                 value = string.Empty,
@@ -205,7 +205,7 @@ public class Program
                         // If it's a texture...
                         // We should prefix the path with "materials/", as well as add the specified file extension for the textures
                         case KeyValueType.Texture:
-                            vmatVariables.Add(new VMATVariable
+                            vmatVariables.Add(new Variable
                             {
                                 key = key,
                                 value = $"materials/{keyvalues[1]}.{fileExtension}",
@@ -221,7 +221,7 @@ public class Program
                         // If it's a number or string...
                         case KeyValueType.String:
                         case KeyValueType.Number:
-                            vmatVariables.Add(new VMATVariable
+                            vmatVariables.Add(new Variable
                             {
                                 key = key,
                                 value = $"{keyvalues[1]}",
@@ -234,38 +234,38 @@ public class Program
                         // If it's a Vector2...
                         // It's effectively an array of floats, parse it as such
                         case KeyValueType.Vector2:
-                            vmatVariables.Add(new VMATVariable
+                            vmatVariables.Add(new Variable
                             {
                                 key = key,
                                 value = $"[{keyvalues[1]} {keyvalues[2]}]",
                                 comment = $"// {line}",
                                 vmtKeyValue = $"{keyvalues[0]} [{keyvalues[1]} {keyvalues[2]}]",
-                                type = VMATVariableType.Vector2
+                                type = VariableType.Vector2
                             });
                             break;
 
                         // If it's a Vector2 with both values being the same...
                         case KeyValueType.SameValueV2:
-                            vmatVariables.Add(new VMATVariable
+                            vmatVariables.Add(new Variable
                             {
                                 key = key,
                                 value = $"[{keyvalues[1]} {keyvalues[1]}]",
                                 comment = $"// {line}",
                                 vmtKeyValue = $"{keyvalues[0]} [{keyvalues[1]} {keyvalues[1]}]",
-                                type = VMATVariableType.Vector2
+                                type = VariableType.Vector2
                             });
                             break;
 
                         // If it's a Vector3...
                         // It's effectively an array of floats, parse it as such
                         case KeyValueType.Vector3:
-                            vmatVariables.Add(new VMATVariable
+                            vmatVariables.Add(new Variable
                             {
                                 key = key,
                                 value = $"[{keyvalues[1]} {keyvalues[2]} {keyvalues[3]}]",
                                 comment = $"// {line}",
                                 vmtKeyValue = $"{keyvalues[0]} [{keyvalues[1]} {keyvalues[2]} {keyvalues[3]}]",
-                                type = VMATVariableType.Vector3
+                                type = VariableType.Vector3
                             });
                             break;
                     }
@@ -278,39 +278,53 @@ public class Program
             }
 
             // If we have a translucency solver, but no translucency texture...
-            if ((vmatVariables.HasVariable(VMATVariableType.Alpha)
-                || vmatVariables.HasVariable(VMATVariableType.Translucency))
-                && !vmatVariables.HasVariable(VMATVariableType.AlphaTexture))
+            if ((vmatVariables.HasVariable(VariableType.Alpha)
+                || vmatVariables.HasVariable(VariableType.Translucency))
+                && !vmatVariables.HasVariable(VariableType.AlphaTexture))
             {
-                vmatVariables.Add(new VMATVariable
+                vmatVariables.Add(new Variable
                 {
                     key = "TextureAlpha",
                     value = vmatVariables.GetVariable("TextureColor")!.value.Replace($".{fileExtension}", $"_trans.{fileExtension}"),
                     comment = "// AUTOGENERATED FROM COLOR TEXTURE",
-                    type = VMATVariableType.AlphaTexture
+                    type = VariableType.AlphaTexture
                 });
             }
 
             // If we have a normal map or roughness texture, but no PBR enabled...
-            if ((vmatVariables.HasVariable(VMATVariableType.NormalTexture)
-                || vmatVariables.HasVariable(VMATVariableType.RoughnessTexture))
-                && !vmatVariables.HasVariable(VMATVariableType.Specular))
+            if ((vmatVariables.HasVariable(VariableType.NormalTexture)
+                || vmatVariables.HasVariable(VariableType.RoughnessTexture))
+                && !vmatVariables.HasVariable(VariableType.Specular))
             {
-                vmatVariables.Add(new VMATVariable
+                vmatVariables.Add(new Variable
                 {
                     key = "F_SPECULAR",
                     value = "1",
                     comment = "// PBR ENABLED",
                     vmtKeyValue = "AUTOGENERATED",
-                    type = VMATVariableType.Specular
+                    type = VariableType.Specular
                 });
             }
 
-            // For every variable...
-            for (int i = 0; i < vmatVariables.Count; i++)
+            // If we have a self-illum texture, but self-illum is not enabled...
+            if (vmatVariables.HasVariable(VariableType.SelfIllumTexture) &&
+                !vmatVariables.HasVariable(VariableType.SelfIllum))
+            {
+                vmatVariables.Add(new Variable
+                {
+                    key = "F_SELF_ILLUM",
+                    value = "1",
+                    comment = "// SELF ILLUM ENABLED",
+                    vmtKeyValue = "AUTOGENERATED",
+                    type = VariableType.SelfIllum
+                });
+            }
+
+                // For every variable...
+                for (int i = 0; i < vmatVariables.Count; i++)
             {
                 // Get the current variable
-                VMATVariable variable = vmatVariables[i];
+                Variable variable = vmatVariables[i];
 
                 // Translate different variable's types to their VMAT equivalent
                 switch (variable.type)
@@ -318,7 +332,7 @@ public class Program
                     default:
                         break;
 
-                    case VMATVariableType.SurfaceProperty:
+                    case VariableType.SurfaceProperty:
                         // This is hacky...
                         sw.WriteLine("\n\tSystemAttributes");
                         sw.WriteLine("\t{");
@@ -328,11 +342,11 @@ public class Program
                         sw.WriteLine("\t}\n");
                         continue;
 
-                    case VMATVariableType.Cubemap:
+                    case VariableType.Cubemap:
                         variable.value = TranslateCubemap(variable.value);
                         break;
 
-                    case VMATVariableType.Detail:
+                    case VariableType.Detail:
                         variable.value = TranslateDetailMode(variable.value);
                         break;
                 }
@@ -420,6 +434,9 @@ public class Program
                 vmatShader = "Invalid";
                 return false;
 
+            // Unlit shader, used for things that feature mainly / only self-illum textures
+            case "unlitgeneric":
+
             // Default shader, used for like 99% of materials
             case "vertexlitgeneric":
 
@@ -466,7 +483,7 @@ public class Program
     /// <param name="vmatKeyword">The resulting VMAT formatted keyword.</param>
     /// <param name="valueType">The type of the value we get.</param>
     /// <returns><see langword="true"/> if we have a successful keyword translation, as well as <paramref name="vmatKeyword"/> getting a value.</returns>
-    private static bool TranslateKeyValue(string vmtKeyword, out string vmatKeyword, out KeyValueType valueType, out VMATVariableType varType)
+    private static bool TranslateKeyValue(string vmtKeyword, out string vmatKeyword, out KeyValueType valueType, out VariableType varType)
     {
         if (string.IsNullOrEmpty(vmtKeyword)
             || vmtKeyword == "{" || vmtKeyword == "}"
@@ -474,7 +491,7 @@ public class Program
         {
             vmatKeyword = "Unknown";
             valueType = KeyValueType.Unknown;
-            varType = VMATVariableType.Unknown;
+            varType = VariableType.Unknown;
             return false;
         }
 
@@ -484,14 +501,14 @@ public class Program
             case "$basetexture":
                 vmatKeyword = "TextureColor";
                 valueType = KeyValueType.Texture;
-                varType = VMATVariableType.ColorTexture;
+                varType = VariableType.ColorTexture;
                 return true;
 
             // Normal map
             case "$bumpmap":
                 vmatKeyword = "TextureNormal";
                 valueType = KeyValueType.Texture;
-                varType = VMATVariableType.NormalTexture;
+                varType = VariableType.NormalTexture;
                 return true;
 
             // Roughness texture
@@ -499,7 +516,7 @@ public class Program
             case "$phongexponenttexture":
                 vmatKeyword = "TextureRoughness";
                 valueType = KeyValueType.Texture;
-                varType = VMATVariableType.RoughnessTexture;
+                varType = VariableType.RoughnessTexture;
                 return true;
 
             // Unknown for now... Might be something scalar with the intensity of the roughness
@@ -507,70 +524,77 @@ public class Program
             case "$phongboost":
                 vmatKeyword = "Unknown";
                 valueType = KeyValueType.Unknown;
-                varType = VMATVariableType.Unknown;
+                varType = VariableType.Unknown;
                 return true;
 
             // Ambient occlusion texture
             case "$ambientocclusiontexture":
                 vmatKeyword = "TextureAmbientOcclusion";
                 valueType = KeyValueType.Texture;
-                varType = VMATVariableType.AOTexture;
+                varType = VariableType.AOTexture;
                 return true;
 
             // Surface properties
             case "$surfaceprop":
                 vmatKeyword = "PhysicsSurfaceProperties";
                 valueType = KeyValueType.String;
-                varType = VMATVariableType.SurfaceProperty;
+                varType = VariableType.SurfaceProperty;
                 return true;
 
             // Alpha texture
             case "$translucent":
                 vmatKeyword = "F_ALPHA_TEST";
                 valueType = KeyValueType.Number;
-                varType = VMATVariableType.Alpha;
+                varType = VariableType.Alpha;
                 return true;
 
             // Detail texture
             case "$detail":
                 vmatKeyword = "TextureDetail";
                 valueType = KeyValueType.Texture;
-                varType = VMATVariableType.DetailTexture;
+                varType = VariableType.DetailTexture;
                 return true;
 
             // Scale of the detail texture
             case "$detailscale":
                 vmatKeyword = "g_vDetailTexCoordScale";
                 valueType = KeyValueType.SameValueV2;
-                varType = VMATVariableType.Vector2;
+                varType = VariableType.Vector2;
                 return true;
 
             // Blend factor of the detail texture
             case "$detailblendfactor":
                 vmatKeyword = "g_flDetailBlendFactor";
                 valueType = KeyValueType.Number;
-                varType = VMATVariableType.Number;
+                varType = VariableType.Number;
                 return true;
 
             // Detail blend mode
             case "$detailblendmode":
                 vmatKeyword = "F_DETAIL_TEXTURE";
                 valueType = KeyValueType.Number;
-                varType = VMATVariableType.Detail;
+                varType = VariableType.Detail;
                 return true;
 
             // Cubemap
             case "$envmap":
                 vmatKeyword = "F_SPECULAR_CUBE_MAP";
                 valueType = KeyValueType.String;
-                varType = VMATVariableType.Cubemap;
+                varType = VariableType.Cubemap;
+                return true;
+
+            // Render backfaces
+            case "$nocull":
+                vmatKeyword = "F_RENDER_BACKFACES";
+                valueType = KeyValueType.Number;
+                varType = VariableType.Number;
                 return true;
         }
 
         Console.Error.WriteLine($"Unknown keyword encountered: \"{vmtKeyword}\"");
         vmatKeyword = "Unknown";
         valueType = KeyValueType.Unknown;
-        varType = VMATVariableType.Unknown;
+        varType = VariableType.Unknown;
         return false;
     }
 
