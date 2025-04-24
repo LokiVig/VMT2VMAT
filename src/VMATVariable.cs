@@ -10,22 +10,22 @@ public class VMATVariable
     /// The keyword for this variable.<br/>
     /// Can be e.g. TextureColor, TextureRoughness, etc.
     /// </summary>
-    public string key;
+    public string key = string.Empty;
 
     /// <summary>
     /// This variable's value.
     /// </summary>
-    public string value;
+    public string value = string.Empty;
 
     /// <summary>
     /// Any comment we wish to write.
     /// </summary>
-    public string comment;
+    public string comment = string.Empty;
 
     /// <summary>
     /// The original VMT keyvalue for this variable.
     /// </summary>
-    public string vmtKeyValue;
+    public string vmtKeyValue = string.Empty;
 
     /// <summary>
     /// The type of variable this is.

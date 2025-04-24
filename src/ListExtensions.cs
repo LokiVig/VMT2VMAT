@@ -51,7 +51,7 @@ public static class ListExtensions
     /// <param name="list">This list.</param>
     /// <param name="desiredType">The desired <see cref="VMATVariableType"/> we wish to search a variable for.</param>
     /// <returns>The variable of the desired type.</returns>
-    public static T GetVariable<T>( this List<T> list, VMATVariableType desiredType )
+    public static T? GetVariable<T>( this List<T> list, VMATVariableType desiredType )
         where T : VMATVariable
     {
         foreach ( T item in list )
@@ -72,7 +72,7 @@ public static class ListExtensions
     /// <param name="list">This list.</param>
     /// <param name="keyword">The desired keyword we wish to search a variable for.</param>
     /// <returns>The variable with the desired keyword.</returns>
-    public static T GetVariable<T>( this List<T> list, string keyword )
+    public static T? GetVariable<T>( this List<T> list, string keyword )
         where T : VMATVariable
     {
         foreach ( T item in list )
