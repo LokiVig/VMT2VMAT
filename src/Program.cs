@@ -367,8 +367,11 @@ public class Program
             Process? vtfCmd = Process.Start( new ProcessStartInfo()
             {
                 FileName = "VTFCmd.exe",
-                Arguments = $"-file \"{vtfPath}\" -exportformat \"{fileExtension}\""
+                Arguments = $"-file \"{vtfPath}\" -exportformat \"{fileExtension}\" -silent"
             } );
+
+            // Log our conversion!
+            Console.WriteLine( $"\"{vtfPath}\" -> \"{Path.ChangeExtension( vtfPath, fileExtension )}\"" );
         }
 
         // Log our success!
