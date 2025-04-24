@@ -510,6 +510,13 @@ public class Program
                 varType = VMATVariableType.Unknown;
                 return true;
 
+            // Ambient occlusion texture
+            case "$ambientocclusiontexture":
+                vmatKeyword = "TextureAmbientOcclusion";
+                valueType = KeyValueType.Texture;
+                varType = VMATVariableType.AOTexture;
+                return true;
+
             // Surface properties
             case "$surfaceprop":
                 vmatKeyword = "PhysicsSurfaceProperties";

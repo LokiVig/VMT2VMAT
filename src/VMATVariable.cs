@@ -104,6 +104,11 @@ public enum VMATVariableType
     MetalnessTexture,
 
     /// <summary>
+    /// The variable is the ambient occlusion texture.
+    /// </summary>
+    AOTexture,
+    
+    /// <summary>
     /// The variable is the artist cubemap texture.
     /// </summary>
     CubemapTexture,
