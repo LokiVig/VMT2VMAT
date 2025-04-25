@@ -5,8 +5,8 @@ It utilizes ![VTFCmd](https://github.com/NeilJed/VTFLib) to automatically turn i
 ## How To Use
 Using CMD you can launch the provided executable file with specified arguments. \
 Those arguments are:
-- "-vmt" - Specifies the path to a valid VMT file. (REQUIRED!)
-- "-vmat" - Specifies the path to the resulting VMAT file.
+- "-input" - Specifies the path to a valid VMT file / folder of VMT files (recursive). (REQUIRED!)
+- "-output" - Specifies the path the resulting VMAT file(s) should be placed.
 - "-version" - Specifies which version of Source 2 we should translate to.
   - hla - Translates to a Half-Life: Alyx compatible VMAT file.
   - cs2 - Translates to a Counter-Strike 2 compatible VMAT file.
