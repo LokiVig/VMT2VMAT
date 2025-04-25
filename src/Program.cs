@@ -162,7 +162,7 @@ public class Program
 
             // Once we're done, log information
             Console.WriteLine( "\nRecursive folder translation finished!" );
-            Console.WriteLine( $"Errors: {errCount}/{fileCount} ({(float)(errCount / fileCount) * 100}%)" );
+            Console.WriteLine( $"Errors: {errCount}/{fileCount} ({(float)( errCount / fileCount ) * 100}%)" );
         }
         else if ( IsValidVMT( inputFile ) ) // Otherwise, if we have a valid VMT file...
         {
@@ -259,6 +259,13 @@ public class Program
                     }
                     else // Error happened translating the shader!
                     {
+                        // If the translated shader is specified as an invalid character...
+                        if ( vmatShader == "InvalidChar" )
+                        {
+                            // Skip to the next line!
+                            continue;
+                        }
+
                         // Write the issue and return
                         sw.WriteLine( "// FAULT! SHADER FAILED TO TRANSLATE" );
                         return false;
@@ -570,6 +577,14 @@ public class Program
     /// <returns>The VMAT equivalent of the VMT shader.</returns>
     private static bool TranslateShader( string vmtShader, out string vmatShader )
     {
+        // Ignore invalid characters
+        if ( string.IsNullOrEmpty( vmtShader )
+            || vmtShader.Contains( "//" ) )
+        {
+            vmatShader = "InvalidChar";
+            return false;
+        }
+
         switch ( vmtShader.ToLower() )
         {
             // No valid shader!
@@ -614,6 +629,20 @@ public class Program
                     default:
                     case EngineVersion.HLA:
                         vmatShader = "vr_simple_2way_blend.vfx";
+                        break;
+                }
+                return true;
+
+            // Refracting shader
+            // AFAIK does NOT exist in HL:A
+            case "refract":
+                switch ( version )
+                {
+                    default:
+                    case EngineVersion.HLA:
+                    case EngineVersion.CS2:
+                    case EngineVersion.Sandbox:
+                        vmatShader = "unknown";
                         break;
                 }
                 return true;
