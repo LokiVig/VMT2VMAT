@@ -7,7 +7,7 @@ public class Program
     /// <summary>
     /// Which version of Source 2 we should parse to.
     /// </summary>
-    private static Source2Version version = Source2Version.HLA;
+    private static EngineVersion version = EngineVersion.HLA;
 
     /// <summary>
     /// Which file type we should use for textures.
@@ -17,7 +17,7 @@ public class Program
     /// <summary>
     /// The path to the VMT file we want to translate.
     /// </summary>
-    private static string vmtPath = "H:\\SteamLibrary\\steamapps\\common\\Half-Life Alyx\\content\\hlvr_addons\\sfm\\materials\\models\\props_c17\\oil_drum001a.vmt";
+    private static string vmtPath = string.Empty;
 
     /// <summary>
     /// The path to the VMAT file we want to translate.
@@ -34,142 +34,143 @@ public class Program
     /// </summary>
     private static List<Variable> vmatVariables = new List<Variable>();
 
-    public static void Main(string[] args)
+    public static void Main( string[] args )
     {
         // Check every argument
-        for (int i = 0; i < args.Length; i++)
+        for ( int i = 0; i < args.Length; i++ )
         {
             // If we're passing the path to a VMT file...
-            if (IsValidArg(args[i], "-vmt"))
+            if ( IsValidArg( args[i], "-vmt" ) )
             {
                 // Use it!
                 vmtPath = args[i + 1];
             }
 
             // If we're passing the path for the output VMAT...
-            if (IsValidArg(args[i], "-vmat"))
+            if ( IsValidArg( args[i], "-vmat" ) )
             {
                 // Use it!
                 vmatPath = args[i + 1];
             }
 
             // If we're specifying a version...
-            if (IsValidArg(args[i], "-version"))
+            if ( IsValidArg( args[i], "-version" ) )
             {
-                if (IsValidArg(args[i + 1], "hla")) // Half-Life: Alyx
+                if ( IsValidArg( args[i + 1], "hla" ) ) // Half-Life: Alyx
                 {
-                    version = Source2Version.HLA;
+                    version = EngineVersion.HLA;
                 }
-                else if (IsValidArg(args[i + 1], "cs2")) // Counter Strike 2
+                else if ( IsValidArg( args[i + 1], "cs2" ) ) // Counter Strike 2
                 {
-                    version = Source2Version.CS2;
+                    version = EngineVersion.CS2;
                 }
-                else if (IsValidArg(args[i + 1], "sbox")) // s&box
+                else if ( IsValidArg( args[i + 1], "sbox" ) ) // s&box
                 {
-                    version = Source2Version.Sandbox;
+                    version = EngineVersion.Sandbox;
                 }
                 else // Assume invalid input! Default to HL:A
                 {
-                    Console.Error.WriteLine("Invalid Source 2 version provided! Defaulting to HLA...");
-                    version = Source2Version.HLA;
+                    Console.Error.WriteLine( "Invalid Source 2 version provided! Defaulting to HLA..." );
+                    version = EngineVersion.HLA;
                 }
             }
 
             // If we're specifying the file extension for our textures...
-            if (IsValidArg(args[i], "-fileextension"))
+            if ( IsValidArg( args[i], "-fileextension" ) )
             {
-                if (IsValidArg(args[i + 1], "tga")) // TGA
+                if ( IsValidArg( args[i + 1], "tga" ) ) // TGA
                 {
                     fileExtension = "tga";
                 }
-                else if (IsValidArg(args[i + 1], "png")) // PNG
+                else if ( IsValidArg( args[i + 1], "png" ) ) // PNG
                 {
                     fileExtension = "png";
                 }
-                else if (IsValidArg(args[i + 1], "jpg")
-                    || IsValidArg(args[i + 1], "jpeg")) // JPG
+                else if ( IsValidArg( args[i + 1], "jpg" )
+                    || IsValidArg( args[i + 1], "jpeg" ) ) // JPG
                 {
                     fileExtension = "jpg";
                 }
                 else // Assume invalid input! Default to TGA
                 {
-                    Console.Error.WriteLine("Invalid file extension provided! Defaulting to TGA...");
+                    Console.Error.WriteLine( "Invalid file extension provided! Defaulting to TGA..." );
                     fileExtension = "tga";
                 }
             }
         }
 
         // If there was no provided VMAT path...
-        if (string.IsNullOrEmpty(vmatPath))
+        if ( string.IsNullOrEmpty( vmatPath ) )
         {
             // Copy the VMT's path and filename, but change the extension to .vmat
-            vmatPath = Path.ChangeExtension(vmtPath, ".vmat");
+            vmatPath = Path.ChangeExtension( vmtPath, ".vmat" );
         }
 
         // Check if the provided path to a VMT is valid...
-        if (!IsValidVMT(vmtPath))
+        if ( !IsValidVMT( vmtPath ) )
         {
             // If not, whoopsie!
-            Console.Error.WriteLine("Invalid VMT file given!");
+            Console.Error.WriteLine( "Invalid VMT file given!" );
             return;
         }
 
         // Log general information
-        Console.WriteLine($"\nFile to translate: \"{vmtPath}\"");
-        Console.WriteLine($"Output file: \"{vmatPath}\"");
-        Console.WriteLine($"Source 2 version: {version}");
-        Console.WriteLine($"File extension: \".{fileExtension}\"\n");
-        Console.WriteLine("Translating VMT to VMAT...\n");
+        Console.WriteLine( $"\nFile to translate: \"{vmtPath}\"" );
+        Console.WriteLine( $"Output file: \"{vmatPath}\"" );
+        Console.WriteLine( $"Source 2 version: {version}" );
+        Console.WriteLine( $"File extension: \".{fileExtension}\"\n" );
+        Console.WriteLine( "Translating VMT to VMAT...\n" );
 
         // Create a file at the path of the VMAT and start writing to it
-        using (StreamWriter sw = new StreamWriter(File.Create(vmatPath)))
+        using ( StreamWriter sw = new StreamWriter( File.Create( vmatPath ) ) )
         {
             // All of the lines in the VMT file
-            string[] lines = File.ReadAllLines(vmtPath);
+            string[] lines = File.ReadAllLines( vmtPath );
 
             // Write some information beforehand
-            sw.WriteLine("//");
-            sw.WriteLine("// THIS FILE WAS AUTOMATICALLY TRANSLATED THROUGH VMT2VMAT");
-            sw.WriteLine("// IF THERE ARE ANY ISSUES WITH THE PROVIDED TRANSLATION; CONTACT LOKI");
-            sw.WriteLine("//");
-            sw.WriteLine($"// INFO: TEXTURE FILE EXTENSION: \".{fileExtension}\", VERSION: \"{version}\"");
-            sw.WriteLine("//");
-            sw.WriteLine("");
-            sw.WriteLine("Layer0");
-            sw.WriteLine("{");
+            sw.WriteLine( "//" );
+            sw.WriteLine( "// THIS FILE WAS AUTOMATICALLY TRANSLATED THROUGH VMT2VMAT" );
+            sw.WriteLine( "// IF THERE ARE ANY ISSUES WITH THE PROVIDED TRANSLATION; CONTACT LOKI" );
+            sw.WriteLine( "//" );
+            sw.WriteLine( $"// INFO: TEXTURE FILE EXTENSION: \".{fileExtension}\", VERSION: \"{version}\"" );
+            sw.WriteLine( "//" );
+            sw.WriteLine( "" );
+            sw.WriteLine( "Layer0" );
+            sw.WriteLine( "{" );
 
             // Check every line in the VMT file...
-            for (int i = 0; i < lines.Length; i++)
+            for ( int i = 0; i < lines.Length; i++ )
             {
                 // The current line
-                string line = lines[i].TrimStart('\t');
+                string line = lines[i].TrimStart( '\t' );
 
                 // The two halves of a keyword, the key and the value
-                string[] keyvalues = line.Split(' ', '\t');
+                string[] keyvalues = line.Split( ' ', '\t' );
 
                 // For every value in the keyword...
-                for (int j = 0; j < keyvalues.Length; j++)
+                for ( int j = 0; j < keyvalues.Length; j++ )
                 {
-                    keyvalues[j] = keyvalues[j].Replace("\"", ""); // Replace the quotes with nothing, we add quotes ourselves
-                    keyvalues[j] = keyvalues[j].Replace("\\", "/"); // Replace backslashes with forward slashes
+                    keyvalues[j] = keyvalues[j].Replace( "\"", "" ); // Replace the quotes with nothing, we add quotes ourselves
+                    keyvalues[j] = keyvalues[j].Replace( "\\", "/" ); // Replace backslashes with forward slashes
                     keyvalues[j] = keyvalues[j].ToLower(); // Make all the text lowercase
                 }
 
                 // If we haven't already translated the shader...
-                if (!vmatVariables.HasVariable(VariableType.Shader))
+                if ( !vmatVariables.HasVariable( VariableType.Shader ) )
                 {
                     // If we can translate the line as a shader...
-                    if (TranslateShader(keyvalues[0], out string vmatShader))
+                    if ( TranslateShader( keyvalues[0], out string vmatShader ) )
                     {
                         // Add a shader to the list of variables in this VMAT
-                        vmatVariables.Add(new Variable
+                        vmatVariables.Add( new Variable
                         {
-                            key = "shader",
-                            value = vmatShader,
-                            comment = $"// {line}",
-                            vmtKeyValue = keyvalues[0],
-                            type = VariableType.Shader
-                        });
+                            Key = "shader",
+                            Value = vmatShader,
+                            Comment = $"// {line}",
+                            VmtKeyValue = keyvalues[0],
+                            Type = VariableType.Shader,
+                            Group = VariableGroup.Shader
+                        } );
 
                         // Skip to the next line
                         continue;
@@ -177,96 +178,102 @@ public class Program
                     else // Error happened translating the shader!
                     {
                         // Write the issue and return
-                        sw.WriteLine("// FAULT! SHADER FAILED TO TRANSLATE");
+                        sw.WriteLine( "// FAULT! SHADER FAILED TO TRANSLATE" );
                         return;
                     }
                 }
 
                 // If we can translate the current keyword...
-                if (TranslateKeyValue(keyvalues[0], out string key, out KeyValueType keyType, out VariableType varType))
+                if ( TranslateKeyValue( keyvalues[0], out string key, out KeyValueType keyType, out VariableType varType, out VariableGroup varGroup ) )
                 {
                     // Check against different types of values we have
 
                     // Depending on the type of value we have...
-                    switch (keyType)
+                    switch ( keyType )
                     {
                         // If it's unknown...
                         case KeyValueType.Unknown:
-                            vmatVariables.Add(new Variable
+                            vmatVariables.Add( new Variable
                             {
-                                key = string.Empty,
-                                value = string.Empty,
-                                comment = $"// UNKNOWN! {line}",
-                                vmtKeyValue = line,
-                                type = varType
-                            });
+                                Key = string.Empty,
+                                Value = string.Empty,
+                                Comment = $"// UNKNOWN! {line}",
+                                VmtKeyValue = line,
+                                Type = varType,
+                                Group = varGroup
+                            } );
                             break;
 
                         // If it's a texture...
                         // We should prefix the path with "materials/", as well as add the specified file extension for the textures
                         case KeyValueType.Texture:
-                            vmatVariables.Add(new Variable
+                            vmatVariables.Add( new Variable
                             {
-                                key = key,
-                                value = $"materials/{keyvalues[1]}.{fileExtension}",
-                                comment = $"// {line}",
-                                vmtKeyValue = $"{keyvalues[0]} {keyvalues[1]}",
-                                type = varType
-                            });
+                                Key = key,
+                                Value = $"materials/{keyvalues[1]}.{fileExtension}",
+                                Comment = $"// {line}",
+                                VmtKeyValue = $"{keyvalues[0]} {keyvalues[1]}",
+                                Type = varType,
+                                Group = varGroup
+                            } );
 
                             // Add the texture to the list of VTF files to be converted
-                            vtfPaths.Add($"materials/{keyvalues[1]}.vtf");
+                            vtfPaths.Add( $"materials/{keyvalues[1]}.vtf" );
                             break;
 
                         // If it's a number or string...
                         case KeyValueType.String:
                         case KeyValueType.Number:
-                            vmatVariables.Add(new Variable
+                            vmatVariables.Add( new Variable
                             {
-                                key = key,
-                                value = $"{keyvalues[1]}",
-                                comment = $"// {line}",
-                                vmtKeyValue = $"{keyvalues[0]} {keyvalues[1]}",
-                                type = varType
-                            });
+                                Key = key,
+                                Value = $"{keyvalues[1]}",
+                                Comment = $"// {line}",
+                                VmtKeyValue = $"{keyvalues[0]} {keyvalues[1]}",
+                                Type = varType,
+                                Group = varGroup
+                            } );
                             break;
 
                         // If it's a Vector2...
                         // It's effectively an array of floats, parse it as such
                         case KeyValueType.Vector2:
-                            vmatVariables.Add(new Variable
+                            vmatVariables.Add( new Variable
                             {
-                                key = key,
-                                value = $"[{keyvalues[1]} {keyvalues[2]}]",
-                                comment = $"// {line}",
-                                vmtKeyValue = $"{keyvalues[0]} [{keyvalues[1]} {keyvalues[2]}]",
-                                type = VariableType.Vector2
-                            });
+                                Key = key,
+                                Value = $"[{keyvalues[1]} {keyvalues[2]}]",
+                                Comment = $"// {line}",
+                                VmtKeyValue = $"{keyvalues[0]} [{keyvalues[1]} {keyvalues[2]}]",
+                                Type = VariableType.Vector2,
+                                Group = varGroup
+                            } );
                             break;
 
                         // If it's a Vector2 with both values being the same...
                         case KeyValueType.SameValueV2:
-                            vmatVariables.Add(new Variable
+                            vmatVariables.Add( new Variable
                             {
-                                key = key,
-                                value = $"[{keyvalues[1]} {keyvalues[1]}]",
-                                comment = $"// {line}",
-                                vmtKeyValue = $"{keyvalues[0]} [{keyvalues[1]} {keyvalues[1]}]",
-                                type = VariableType.Vector2
-                            });
+                                Key = key,
+                                Value = $"[{keyvalues[1]} {keyvalues[1]}]",
+                                Comment = $"// {line}",
+                                VmtKeyValue = $"{keyvalues[0]} [{keyvalues[1]} {keyvalues[1]}]",
+                                Type = VariableType.Vector2,
+                                Group = varGroup
+                            } );
                             break;
 
                         // If it's a Vector3...
                         // It's effectively an array of floats, parse it as such
                         case KeyValueType.Vector3:
-                            vmatVariables.Add(new Variable
+                            vmatVariables.Add( new Variable
                             {
-                                key = key,
-                                value = $"[{keyvalues[1]} {keyvalues[2]} {keyvalues[3]}]",
-                                comment = $"// {line}",
-                                vmtKeyValue = $"{keyvalues[0]} [{keyvalues[1]} {keyvalues[2]} {keyvalues[3]}]",
-                                type = VariableType.Vector3
-                            });
+                                Key = key,
+                                Value = $"[{keyvalues[1]} {keyvalues[2]} {keyvalues[3]}]",
+                                Comment = $"// {line}",
+                                VmtKeyValue = $"{keyvalues[0]} [{keyvalues[1]} {keyvalues[2]} {keyvalues[3]}]",
+                                Type = VariableType.Vector3,
+                                Group = varGroup
+                            } );
                             break;
                     }
                 }
@@ -278,133 +285,186 @@ public class Program
             }
 
             // If we have a translucency solver, but no translucency texture...
-            if ((vmatVariables.HasVariable(VariableType.Alpha)
-                || vmatVariables.HasVariable(VariableType.Translucency))
-                && !vmatVariables.HasVariable(VariableType.AlphaTexture))
+            if ( ( vmatVariables.HasVariable( VariableType.Alpha )
+                || vmatVariables.HasVariable( VariableType.Translucency ) )
+                && !vmatVariables.HasVariable( VariableType.AlphaTexture ) )
             {
-                vmatVariables.Add(new Variable
+                vmatVariables.Add( new Variable
                 {
-                    key = "TextureAlpha",
-                    value = vmatVariables.GetVariable("TextureColor")!.value.Replace($".{fileExtension}", $"_trans.{fileExtension}"),
-                    comment = "// AUTOGENERATED FROM COLOR TEXTURE",
-                    type = VariableType.AlphaTexture
-                });
+                    Key = "TextureAlpha",
+                    Value = vmatVariables.GetVariable( "TextureColor" )!.Value.Replace( $".{fileExtension}", $"_trans.{fileExtension}" ),
+                    Comment = "// AUTOGENERATED FROM COLOR TEXTURE",
+                    Type = VariableType.AlphaTexture
+                } );
             }
 
             // If we have a normal map or roughness texture, but no PBR enabled...
-            if ((vmatVariables.HasVariable(VariableType.NormalTexture)
-                || vmatVariables.HasVariable(VariableType.RoughnessTexture))
-                && !vmatVariables.HasVariable(VariableType.Specular))
+            if ( ( vmatVariables.HasVariable( VariableType.NormalTexture )
+                || vmatVariables.HasVariable( VariableType.RoughnessTexture ) )
+                && !vmatVariables.HasVariable( VariableType.Specular ) )
             {
-                vmatVariables.Add(new Variable
+                vmatVariables.Add( new Variable
                 {
-                    key = "F_SPECULAR",
-                    value = "1",
-                    comment = "// PBR ENABLED",
-                    vmtKeyValue = "AUTOGENERATED",
-                    type = VariableType.Specular
-                });
+                    Key = "F_SPECULAR",
+                    Value = "1",
+                    Comment = "// PBR ENABLED",
+                    VmtKeyValue = "AUTOGENERATED",
+                    Type = VariableType.Specular,
+                    Group = VariableGroup.Roughness
+                } );
             }
 
             // If we have a self-illum texture, but self-illum is not enabled...
-            if (vmatVariables.HasVariable(VariableType.SelfIllumTexture) &&
-                !vmatVariables.HasVariable(VariableType.SelfIllum))
+            if ( vmatVariables.HasVariable( VariableType.SelfIllumTexture ) &&
+                !vmatVariables.HasVariable( VariableType.SelfIllum ) )
             {
-                vmatVariables.Add(new Variable
+                vmatVariables.Add( new Variable
                 {
-                    key = "F_SELF_ILLUM",
-                    value = "1",
-                    comment = "// SELF ILLUM ENABLED",
-                    vmtKeyValue = "AUTOGENERATED",
-                    type = VariableType.SelfIllum
-                });
+                    Key = "F_SELF_ILLUM",
+                    Value = "1",
+                    Comment = "// SELF-ILLUM ENABLED",
+                    VmtKeyValue = "AUTOGENERATED",
+                    Type = VariableType.SelfIllum,
+                    Group = VariableGroup.SelfIllum
+                } );
+            }
+            else if ( vmatVariables.HasVariable( VariableType.SelfIllum ) && // BUT, if we have self-illum enabled, but no self-illum texture...
+                !vmatVariables.HasVariable( VariableType.SelfIllumTexture ) )
+            {
+                vmatVariables.Add( new Variable
+                {
+                    Key = "TextureSelfIllum",
+                    Value = vmatVariables.GetVariable( "TextureColor" )!.Value.Replace( $".{fileExtension}", $"_selfillum.{fileExtension}" ),
+                    Comment = "// AUTOGENERATED FROM COLOR TEXTURE",
+                    VmtKeyValue = "AUTOGENERATED",
+                    Type = VariableType.SelfIllumTexture,
+                    Group = VariableGroup.SelfIllum
+                } );
             }
 
-                // For every variable...
-                for (int i = 0; i < vmatVariables.Count; i++)
+            Dictionary<VariableGroup, List<Variable>> groups = new();
+
+            // For every variable...
+            for ( int i = 0; i < vmatVariables.Count; i++ )
             {
                 // Get the current variable
                 Variable variable = vmatVariables[i];
 
-                // Translate different variable's types to their VMAT equivalent
-                switch (variable.type)
+                // If we don't already have this group...
+                if ( !groups.ContainsKey( variable.Group ) )
                 {
-                    default:
-                        break;
-
-                    case VariableType.SurfaceProperty:
-                        // This is hacky...
-                        sw.WriteLine("\n\tSystemAttributes");
-                        sw.WriteLine("\t{");
-
-                        sw.WriteLine($"\t\tPhysicsSurfaceProperties \"{TranslateSurfaceProperty(variable.value)}\"");
-
-                        sw.WriteLine("\t}\n");
-                        continue;
-
-                    case VariableType.Cubemap:
-                        variable.value = TranslateCubemap(variable.value);
-                        break;
-
-                    case VariableType.Detail:
-                        variable.value = TranslateDetailMode(variable.value);
-                        break;
+                    // Add it and a new list of variables, including this one
+                    groups.Add( variable.Group, new List<Variable>( [variable] ) );
+                }
+                else // Otherwise...
+                {
+                    // Get the group and add this variable to its list of variables
+                    groups[variable.Group].Add( variable );
                 }
 
-                // Write its information to the VMAT file!
-                sw.WriteLine($"\t{variable.key} {(!string.IsNullOrEmpty(variable.value) ? $"\"{variable.value}\"" : "")} {variable.comment}");
+                // Order the groups...
+                if ( groups.Count > 1 )
+                {
+                    // Sort the groups by their group type
+                    groups = groups.OrderBy( x => x.Key ).ToDictionary( x => x.Key, x => x.Value );
+                }
+            }
 
-                // Log that we've written the current variable
-                Console.WriteLine($"\"{variable.vmtKeyValue}\" -> \"{variable.key} {variable.value}\"");
+            // For every group...
+            foreach ( VariableGroup group in groups.Keys )
+            {
+                // Write some prefix information
+                sw.WriteLine( $"\t// -- {group} --" );
+
+                // For every variable in the group...
+                for ( int i = 0; i < groups[group].Count; i++ )
+                {
+                    // The current variable in the current group
+                    Variable variable = groups[group][i];
+
+                    // Translate different variable types to their VMAT equivalent
+                    switch ( variable.Type )
+                    {
+                        default:
+                            break;
+
+                        case VariableType.SurfaceProperty:
+                            // This is hacky...
+                            sw.WriteLine( "\n\tSystemAttributes" );
+                            sw.WriteLine( "\t{" );
+
+                            sw.WriteLine( $"\t\tPhysicsSurfaceProperties \"{TranslateSurfaceProperty( variable.Value )}\"" );
+
+                            sw.WriteLine( "\t}\n" );
+                            continue;
+
+                        case VariableType.Cubemap:
+                            variable.Value = TranslateCubemap( variable.Value );
+                            break;
+
+                        case VariableType.Detail:
+                            variable.Value = TranslateDetailMode( variable.Value );
+                            break;
+                    }
+
+                    // Write its information to the VMAT file!
+                    sw.WriteLine( $"\t{variable.Key} {( !string.IsNullOrEmpty( variable.Value ) ? $"\"{variable.Value}\"" : "" )} {variable.Comment}" );
+
+                    // Log that we've written the current variable
+                    Console.WriteLine( $"\"{variable.VmtKeyValue}\" -> \"{variable.Key} {variable.Value}\"" );
+                }
+
+                // Write a new line, for formatting
+                sw.WriteLine( "" );
             }
 
             // Closing remarks
-            sw.WriteLine("}");
+            sw.WriteLine( "}" );
             sw.Close();
         }
 
         // Log that we're now converting VTFs
-        Console.WriteLine($"\nConverting VTFs to {fileExtension.ToUpper()}s...\n");
+        Console.WriteLine( $"\nConverting VTFs to {fileExtension.ToUpper()}s...\n" );
 
         // Convert our VTFs using VTFEdit to the preferred file extension
-        for (int i = 0; i < vtfPaths.Count; i++)
+        for ( int i = 0; i < vtfPaths.Count; i++ )
         {
             // Get the directory of the VMT file
-            string vmtDir = Path.GetDirectoryName(vmtPath)?.Replace('\\', '/') ?? string.Empty;
+            string vmtDir = Path.GetDirectoryName( vmtPath )?.Replace( '\\', '/' ) ?? string.Empty;
 
             // Get the index of "materials"
-            int materialsIndex = vmtDir.IndexOf("materials");
+            int materialsIndex = vmtDir.IndexOf( "materials" );
 
             // Remove "materials" and everything after it
-            if (materialsIndex >= 0)
+            if ( materialsIndex >= 0 )
             {
-                vmtDir = vmtDir.Substring(0, materialsIndex);
+                vmtDir = vmtDir.Substring( 0, materialsIndex );
             }
 
             // The current VTF file
-            string vtfPath = Path.Combine(vmtDir!, vtfPaths[i]);
+            string vtfPath = Path.Combine( vmtDir!, vtfPaths[i] );
 
             // If there's no file at this path...
-            if (!File.Exists(vtfPath))
+            if ( !File.Exists( vtfPath ) )
             {
                 // Error!
-                Console.Error.WriteLine($"Couldn't find a VTF file at path \"{vtfPath}\"!");
+                Console.Error.WriteLine( $"Couldn't find a VTF file at path \"{vtfPath}\"!" );
                 return;
             }
 
             // Create an instance of VTFCMD to convert the VTF to our desired file extension
-            Process? vtfCmd = Process.Start(new ProcessStartInfo()
+            Process? vtfCmd = Process.Start( new ProcessStartInfo()
             {
                 FileName = "VTFCmd.exe",
                 Arguments = $"-file \"{vtfPath}\" -exportformat \"{fileExtension}\" -silent"
-            });
+            } );
 
             // Log our conversion!
-            Console.WriteLine($"\"{Path.GetFileName(vtfPath)}\" -> \"{Path.GetFileName(Path.ChangeExtension(vtfPath, fileExtension))}\"");
+            Console.WriteLine( $"\"{Path.GetFileName( vtfPath )}\" -> \"{Path.GetFileName( Path.ChangeExtension( vtfPath, fileExtension ) )}\"" );
         }
 
         // Log our success!
-        Console.WriteLine("\nSuccessfully translated VMT to VMAT!");
+        Console.WriteLine( "\nSuccessfully translated VMT to VMAT!" );
     }
 
     /// <summary>
@@ -412,10 +472,10 @@ public class Program
     /// </summary>
     /// <param name="vmtPath">The path to the VMT file we wish to check.</param>
     /// <returns><see langword="true"/> if the path is valid.</returns>
-    private static bool IsValidVMT(string vmtPath)
+    private static bool IsValidVMT( string vmtPath )
     {
         // Make sure the path has some sort of content, that the file actually exists, and that it's extension is ".vmt"
-        return !string.IsNullOrEmpty(vmtPath) && File.Exists(vmtPath) && Path.GetExtension(vmtPath) == ".vmt";
+        return !string.IsNullOrEmpty( vmtPath ) && File.Exists( vmtPath ) && Path.GetExtension( vmtPath ) == ".vmt";
     }
 
     /// <summary>
@@ -424,13 +484,13 @@ public class Program
     /// <param name="vmtShader">The VMT shader we wish to translate.</param>
     /// <param name="vmatShader">The VMAT equivalent of the argument shader.</param>
     /// <returns>The VMAT equivalent of the VMT shader.</returns>
-    private static bool TranslateShader(string vmtShader, out string vmatShader)
+    private static bool TranslateShader( string vmtShader, out string vmatShader )
     {
-        switch (vmtShader.ToLower())
+        switch ( vmtShader.ToLower() )
         {
             // No valid shader!
             default:
-                Console.Error.WriteLine("Invalid shader provided!");
+                Console.Error.WriteLine( "Invalid shader provided!" );
                 vmatShader = "Invalid";
                 return false;
 
@@ -442,21 +502,21 @@ public class Program
 
             // LightmappedGeneric, used for floors and walls and stuff
             case "lightmappedgeneric":
-                switch (version)
+                switch ( version )
                 {
                     // In HL:A it's known as "VR Complex"
                     default:
-                    case Source2Version.HLA:
+                    case EngineVersion.HLA:
                         vmatShader = "vr_complex.vfx";
                         break;
 
                     // Last I checked, in CS2 it's known as "Complex"
-                    case Source2Version.CS2:
+                    case EngineVersion.CS2:
                         vmatShader = "complex.vfx";
                         break;
 
                     // In s&box it's also known as "Complex", but with extra information
-                    case Source2Version.Sandbox:
+                    case EngineVersion.Sandbox:
                         vmatShader = "shaders/complex.shader";
                         break;
                 }
@@ -464,11 +524,11 @@ public class Program
 
             // Per-pixel 2-way blend
             case "worldvertextransition":
-                switch (version)
+                switch ( version )
                 {
                     // In HL:A it's known as "VR Simple 2way Blend"
                     default:
-                    case Source2Version.HLA:
+                    case EngineVersion.HLA:
                         vmatShader = "vr_simple_2way_blend.vfx";
                         break;
                 }
@@ -479,122 +539,146 @@ public class Program
     /// <summary>
     /// Tries to translate a VMT keyword to a VMAT one.
     /// </summary>
-    /// <param name="vmtKeyword">The keyword in VMT format.</param>
-    /// <param name="vmatKeyword">The resulting VMAT formatted keyword.</param>
-    /// <param name="valueType">The type of the value we get.</param>
-    /// <returns><see langword="true"/> if we have a successful keyword translation, as well as <paramref name="vmatKeyword"/> getting a value.</returns>
-    private static bool TranslateKeyValue(string vmtKeyword, out string vmatKeyword, out KeyValueType valueType, out VariableType varType)
+    /// <param name="vmtKey">The keyword in VMT format.</param>
+    /// <param name="vmatKey">The resulting VMAT formatted keyword.</param>
+    /// <param name="valType">The type of the value we get.</param>
+    /// <returns><see langword="true"/> if we have a successful keyword translation, as well as <paramref name="vmatKey"/> getting a value.</returns>
+    private static bool TranslateKeyValue( string vmtKey, out string vmatKey, out KeyValueType valType, out VariableType varType, out VariableGroup varGroup )
     {
-        if (string.IsNullOrEmpty(vmtKeyword)
-            || vmtKeyword == "{" || vmtKeyword == "}"
-            || vmtKeyword == "//" || vmtKeyword.Contains("//"))
+        // Ignore empty lines, comments, and other invalid characters
+        if ( string.IsNullOrEmpty( vmtKey )
+            || vmtKey == "{" || vmtKey == "}"
+            || vmtKey.Contains( "//" ) )
         {
-            vmatKeyword = "Unknown";
-            valueType = KeyValueType.Unknown;
+            vmatKey = "Unknown";
+            valType = KeyValueType.Unknown;
             varType = VariableType.Unknown;
+            varGroup = VariableGroup.Unknown;
             return false;
         }
 
-        switch (vmtKeyword)
+        switch ( vmtKey )
         {
             // Color texture
             case "$basetexture":
-                vmatKeyword = "TextureColor";
-                valueType = KeyValueType.Texture;
+                vmatKey = "TextureColor";
+                valType = KeyValueType.Texture;
                 varType = VariableType.ColorTexture;
+                varGroup = VariableGroup.Color;
                 return true;
 
             // Normal map
             case "$bumpmap":
-                vmatKeyword = "TextureNormal";
-                valueType = KeyValueType.Texture;
+                vmatKey = "TextureNormal";
+                valType = KeyValueType.Texture;
                 varType = VariableType.NormalTexture;
+                varGroup = VariableGroup.Normal;
                 return true;
 
             // Roughness texture
             case "$phongexponent":
             case "$phongexponenttexture":
-                vmatKeyword = "TextureRoughness";
-                valueType = KeyValueType.Texture;
+                vmatKey = "TextureRoughness";
+                valType = KeyValueType.Texture;
                 varType = VariableType.RoughnessTexture;
+                varGroup = VariableGroup.Roughness;
                 return true;
 
             // Unknown for now... Might be something scalar with the intensity of the roughness
             // texture, no clue
             case "$phongboost":
-                vmatKeyword = "Unknown";
-                valueType = KeyValueType.Unknown;
+                vmatKey = "Unknown";
+                valType = KeyValueType.Unknown;
                 varType = VariableType.Unknown;
+                varGroup = VariableGroup.Roughness;
                 return true;
 
             // Ambient occlusion texture
             case "$ambientocclusiontexture":
-                vmatKeyword = "TextureAmbientOcclusion";
-                valueType = KeyValueType.Texture;
+                vmatKey = "TextureAmbientOcclusion";
+                valType = KeyValueType.Texture;
                 varType = VariableType.AOTexture;
+                varGroup = VariableGroup.AmbientOcclusion;
                 return true;
 
             // Surface properties
             case "$surfaceprop":
-                vmatKeyword = "PhysicsSurfaceProperties";
-                valueType = KeyValueType.String;
+                vmatKey = "PhysicsSurfaceProperties";
+                valType = KeyValueType.String;
                 varType = VariableType.SurfaceProperty;
+                varGroup = VariableGroup.Physics;
                 return true;
 
             // Alpha texture
             case "$translucent":
-                vmatKeyword = "F_ALPHA_TEST";
-                valueType = KeyValueType.Number;
+                vmatKey = "F_ALPHA_TEST";
+                valType = KeyValueType.Number;
                 varType = VariableType.Alpha;
+                varGroup = VariableGroup.Alpha;
                 return true;
 
             // Detail texture
             case "$detail":
-                vmatKeyword = "TextureDetail";
-                valueType = KeyValueType.Texture;
+                vmatKey = "TextureDetail";
+                valType = KeyValueType.Texture;
                 varType = VariableType.DetailTexture;
+                varGroup = VariableGroup.Detail;
                 return true;
 
             // Scale of the detail texture
             case "$detailscale":
-                vmatKeyword = "g_vDetailTexCoordScale";
-                valueType = KeyValueType.SameValueV2;
+                vmatKey = "g_vDetailTexCoordScale";
+                valType = KeyValueType.SameValueV2;
                 varType = VariableType.Vector2;
+                varGroup = VariableGroup.Detail;
                 return true;
 
             // Blend factor of the detail texture
             case "$detailblendfactor":
-                vmatKeyword = "g_flDetailBlendFactor";
-                valueType = KeyValueType.Number;
+                vmatKey = "g_flDetailBlendFactor";
+                valType = KeyValueType.Number;
                 varType = VariableType.Number;
+                varGroup = VariableGroup.Detail;
                 return true;
 
             // Detail blend mode
             case "$detailblendmode":
-                vmatKeyword = "F_DETAIL_TEXTURE";
-                valueType = KeyValueType.Number;
+                vmatKey = "F_DETAIL_TEXTURE";
+                valType = KeyValueType.Number;
                 varType = VariableType.Detail;
+                varGroup = VariableGroup.Detail;
                 return true;
 
             // Cubemap
             case "$envmap":
-                vmatKeyword = "F_SPECULAR_CUBE_MAP";
-                valueType = KeyValueType.String;
+                vmatKey = "F_SPECULAR_CUBE_MAP";
+                valType = KeyValueType.String;
                 varType = VariableType.Cubemap;
+                varGroup = VariableGroup.Roughness;
                 return true;
 
             // Render backfaces
             case "$nocull":
-                vmatKeyword = "F_RENDER_BACKFACES";
-                valueType = KeyValueType.Number;
+                vmatKey = "F_RENDER_BACKFACES";
+                valType = KeyValueType.Number;
                 varType = VariableType.Number;
+                varGroup = VariableGroup.Unknown;
+                return true;
+
+            // Self-illum
+            case "$selfillum":
+                vmatKey = "F_SELF_ILLUM";
+                valType = KeyValueType.Number;
+                varType = VariableType.SelfIllum;
+                varGroup = VariableGroup.SelfIllum;
                 return true;
         }
 
-        Console.Error.WriteLine($"Unknown keyword encountered: \"{vmtKeyword}\"");
-        vmatKeyword = "Unknown";
-        valueType = KeyValueType.Unknown;
+        Console.Error.WriteLine( $"Unknown keyword encountered: \"{vmtKey}\"" );
+        vmatKey = "Unknown";
+        valType = KeyValueType.Unknown;
         varType = VariableType.Unknown;
+        varGroup = VariableGroup.Unknown;
         return false;
     }
 
@@ -603,22 +687,34 @@ public class Program
     /// </summary>
     /// <param name="vmtSurfProp">The surface property from the VMT.</param>
     /// <returns>The VMAT equivalent of the provided VMT surface property.</returns>
-    private static string TranslateSurfaceProperty(string vmtSurfProp)
+    private static string TranslateSurfaceProperty( string vmtSurfProp )
     {
-        switch (vmtSurfProp)
+        switch ( vmtSurfProp )
         {
             default:
                 return "Unknown";
 
-            case "metal":
-                switch (version)
+            case "concrete":
+                switch ( version )
                 {
                     default:
-                    case Source2Version.HLA:
-                    case Source2Version.CS2:
+                    case EngineVersion.HLA:
+                    case EngineVersion.CS2:
+                        return "prop.concrete";
+
+                    case EngineVersion.Sandbox:
+                        return "concrete";
+                }
+
+            case "metal":
+                switch ( version )
+                {
+                    default:
+                    case EngineVersion.HLA:
+                    case EngineVersion.CS2:
                         return "prop.metal";
 
-                    case Source2Version.Sandbox:
+                    case EngineVersion.Sandbox:
                         return "metal";
                 }
         }
@@ -629,9 +725,9 @@ public class Program
     /// </summary>
     /// <param name="vmtDetailMode">The VMT detail mode.</param>
     /// <returns>The equivalent VMAT detail blend mode.</returns>
-    private static string TranslateDetailMode(string vmtDetailMode)
+    private static string TranslateDetailMode( string vmtDetailMode )
     {
-        switch (vmtDetailMode)
+        switch ( vmtDetailMode )
         {
             default:
                 return "Invalid"; // Invalid / unknown detail mode
@@ -646,12 +742,12 @@ public class Program
     /// </summary>
     /// <param name="vmtCubemapMode">The mode the VMT cubemap's using.</param>
     /// <returns>The VMAT equivalent of the VMT cubemap mode.</returns>
-    private static string TranslateCubemap(string vmtCubemapMode)
+    private static string TranslateCubemap( string vmtCubemapMode )
     {
-        switch (vmtCubemapMode)
+        switch ( vmtCubemapMode )
         {
             default:
-                return "Invalid"; // Invalid / unknown detail mode
+                return "Invalid"; // Invalid / unknown cubemap mode
 
             case "env_cubemap": // Environment / in-game cubemap
                 return "1";
@@ -664,16 +760,16 @@ public class Program
     /// <param name="input">The input argument.</param>
     /// <param name="validArg">The valid argument we wish to check against.</param>
     /// <returns><see langword="true"/> if the input is a valid argument.</returns>
-    private static bool IsValidArg(string input, string validArg)
+    private static bool IsValidArg( string input, string validArg )
     {
-        return input.Equals(validArg, StringComparison.OrdinalIgnoreCase);
+        return input.Equals( validArg, StringComparison.OrdinalIgnoreCase );
     }
 
     /// <summary>
     /// The different versions of Source 2 to handle.<br/>
     /// Each of them have slight differences in e.g. shaders, this lets us easily switch between them.
     /// </summary>
-    private enum Source2Version
+    private enum EngineVersion
     {
         /// <summary>
         /// Half-Life: Alyx.

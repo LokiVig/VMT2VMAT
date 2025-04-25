@@ -14,7 +14,7 @@ public static class ListExtensions
     {
         foreach ( T item in list )
         {
-            if ( item.type == desiredType )
+            if ( item.Type == desiredType )
             {
                 return true;
             }
@@ -35,7 +35,7 @@ public static class ListExtensions
     {
         foreach ( T item in list )
         {
-            if ( item.key == keyword )
+            if ( item.Key == keyword )
             {
                 return true;
             }
@@ -56,7 +56,7 @@ public static class ListExtensions
     {
         foreach ( T item in list )
         {
-            if ( item.type == desiredType )
+            if ( item.Type == desiredType )
             {
                 return item;
             }
@@ -68,7 +68,7 @@ public static class ListExtensions
     /// <summary>
     /// Gets a variable with the desired keyword from the list.
     /// </summary>
-    /// <typeparam name="T">Should be <see cref="Variable"/>.s</typeparam>
+    /// <typeparam name="T">Should be <see cref="Variable"/>.</typeparam>
     /// <param name="list">This list.</param>
     /// <param name="keyword">The desired keyword we wish to search a variable for.</param>
     /// <returns>The variable with the desired keyword.</returns>
@@ -77,12 +77,27 @@ public static class ListExtensions
     {
         foreach ( T item in list )
         {
-            if ( item.key == keyword )
+            if ( item.Key == keyword )
             {
                 return item;
             }
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Gets the list of variables from one group.
+    /// </summary>
+    /// <typeparam name="T">Should be <see cref="Variable"/>.</typeparam>
+    /// <param name="list">This list.</param>
+    /// <param name="group">The desired group we wish to get variables from.</param>
+    /// <returns>An enumerable list of variables from the desired group.</returns>
+    public static List<T>? GetVariablesFromGroup<T>( this List<T> list, VariableGroup group )
+        where T : Variable
+    {
+        List<T> result = (List<T>)list.Where( item => item.Group == group );
+
+        return result.Count() > 0 ? result : null;
     }
 }
