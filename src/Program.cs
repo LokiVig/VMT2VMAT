@@ -211,7 +211,7 @@ public class Program
 
             // Write some information beforehand
             sw.WriteLine( "//" );
-            sw.WriteLine( "// THIS FILE WAS AUTOMATICALLY TRANSLATED THROUGH VMT2VMAT" );
+            sw.WriteLine( "// THIS FILE WAS AUTOMATICALLY TRANSLATED THROUGH VMT2VMAT V.1.1" );
             sw.WriteLine( "// IF THERE ARE ANY ISSUES WITH THE PROVIDED TRANSLATION; CONTACT LOKI" );
             sw.WriteLine( "//" );
             sw.WriteLine( $"// INFO: TEXTURE FILE EXTENSION: \".{fileExtension}\", ENGINE VERSION: \"{version}\"" );
