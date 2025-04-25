@@ -162,7 +162,7 @@ public class Program
 
             // Once we're done, log information
             Console.WriteLine( "\nRecursive folder translation finished!" );
-            Console.WriteLine( $"Errors: {errCount}/{fileCount} ({(float)( errCount / fileCount ) * 100}%)" );
+            Console.WriteLine( $"{errCount} errors / {fileCount} files ({(float)( ( errCount / fileCount ) * 100 ):0.##}%)" );
         }
         else if ( IsValidVMT( inputFile ) ) // Otherwise, if we have a valid VMT file...
         {
