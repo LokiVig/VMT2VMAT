@@ -132,7 +132,7 @@ public class Program
             sw.WriteLine( "// THIS FILE WAS AUTOMATICALLY TRANSLATED THROUGH VMT2VMAT" );
             sw.WriteLine( "// IF THERE ARE ANY ISSUES WITH THE PROVIDED TRANSLATION; CONTACT LOKI" );
             sw.WriteLine( "//" );
-            sw.WriteLine( $"// INFO: TEXTURE FILE EXTENSION: \".{fileExtension}\", VERSION: \"{version}\"" );
+            sw.WriteLine( $"// INFO: TEXTURE FILE EXTENSION: \".{fileExtension}\", ENGINE VERSION: \"{version}\"" );
             sw.WriteLine( "//" );
             sw.WriteLine( "" );
             sw.WriteLine( "Layer0" );
@@ -448,7 +448,7 @@ public class Program
             if ( !File.Exists( vtfPath ) )
             {
                 // Error!
-                Console.Error.WriteLine( $"Couldn't find a VTF file at path \"{vtfPath}\"!" );
+                Console.Error.WriteLine( $"Couldn't find VTF file at path \"{vtfPath}\"!" );
                 return;
             }
 
@@ -559,6 +559,15 @@ public class Program
 
         switch ( vmtKey )
         {
+            // If the key isn't recognized
+            default:
+                Console.Error.WriteLine( $"Unknown VMT key encountered: \"{vmtKey}\"" );
+                vmatKey = "Unknown";
+                valType = KeyValueType.Unknown;
+                varType = VariableType.Unknown;
+                varGroup = VariableGroup.Unknown;
+                return false;
+
             // Color texture
             case "$basetexture":
                 vmatKey = "TextureColor";
@@ -576,7 +585,6 @@ public class Program
                 return true;
 
             // Roughness texture
-            case "$phongexponent":
             case "$phongexponenttexture":
                 vmatKey = "TextureRoughness";
                 valType = KeyValueType.Texture;
@@ -584,12 +592,11 @@ public class Program
                 varGroup = VariableGroup.Roughness;
                 return true;
 
-            // Unknown for now... Might be something scalar with the intensity of the roughness
-            // texture, no clue
+            // Roughness scale
             case "$phongboost":
-                vmatKey = "Unknown";
-                valType = KeyValueType.Unknown;
-                varType = VariableType.Unknown;
+                vmatKey = "g_flRoughnessScaleFactor";
+                valType = KeyValueType.Number;
+                varType = VariableType.Number;
                 varGroup = VariableGroup.Roughness;
                 return true;
 
@@ -673,13 +680,6 @@ public class Program
                 varGroup = VariableGroup.SelfIllum;
                 return true;
         }
-
-        Console.Error.WriteLine( $"Unknown keyword encountered: \"{vmtKey}\"" );
-        vmatKey = "Unknown";
-        valType = KeyValueType.Unknown;
-        varType = VariableType.Unknown;
-        varGroup = VariableGroup.Unknown;
-        return false;
     }
 
     /// <summary>
