@@ -141,14 +141,14 @@ public enum VariableType
     Alpha,
 
     /// <summary>
-    /// The variable defines that we're using the default translucency solver.
-    /// </summary>
-    Translucency,
-
-    /// <summary>
     /// The variable defines that we're using self-illum.
     /// </summary>
     SelfIllum,
+
+    /// <summary>
+    /// The variable defines this material as an overlay.
+    /// </summary>
+    Overlay,
 
     /// <summary>
     /// The variable is the color texture.
