@@ -42,6 +42,7 @@ public class Program
     /// Does everything necessary to actually translate a VMT to a VMAT.
     /// </summary>
     /// <param name="args">The user's input arguments.</param>
+    [STAThread]
     public static void Main(string[] args)
     {
         // Check every argument
@@ -148,21 +149,27 @@ public class Program
             int fileCount = files.Length; // The total amount of files
             int errCount = 0; // The total amount of errors
 
+            // Start a new stopwatch, we need to record just how long it takes to do this!
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             // For every file in this folder and all recursive folders...
-            for (int i = 0; i < fileCount; i++)
+            Parallel.ForEach(files, file =>
             {
                 // If it can't translate the current file...
-                if (!TranslateFile(files[i]))
+                if (!TranslateFile(file))
                 {
                     // Increase the amount of errors!
-                    errCount++;
-                    continue;
+                    Interlocked.Increment(ref errCount);
                 }
-            }
+            });
+
+            // Stop the stopwatch! We've done it all
+            stopwatch.Stop();
 
             // Once we're done, log information
             Console.WriteLine("\nRecursive folder translation finished!");
             Console.WriteLine($"{errCount} errors / {fileCount} files ({((float)errCount / fileCount) * 100:0.##}%)");
+            Console.WriteLine(@$"Time to complete: {stopwatch.Elapsed:m\:ss\.fff}");
         }
         else if (IsValidVMT(inputFile)) // Otherwise, if we have a valid VMT file...
         {
