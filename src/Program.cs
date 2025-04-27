@@ -39,6 +39,11 @@ public class Program
     private static string outputFolder = string.Empty;
 
     /// <summary>
+    /// Determines if folder translation is recursive or not.
+    /// </summary>
+    private static bool recursive = false;
+
+    /// <summary>
     /// Does everything necessary to actually translate a VMT to a VMAT.
     /// </summary>
     /// <param name="args">The user's input arguments.</param>
@@ -48,7 +53,8 @@ public class Program
         for (int i = 0; i < args.Length; i++)
         {
             // If we're passing the path to a VMT file...
-            if (IsValidArg(args[i], "-input"))
+            if (IsValidArg(args[i], "-input")
+                || IsValidArg(args[i], "-i"))
             {
                 // If the argument features an extension...
                 if (Path.HasExtension(args[i + 1]))
@@ -64,7 +70,8 @@ public class Program
             }
 
             // If we're passing the path for the output VMAT...
-            if (IsValidArg(args[i], "-output"))
+            if (IsValidArg(args[i], "-output")
+                || IsValidArg(args[i], "-o"))
             {
                 // If the argument features an extension...
                 if (Path.HasExtension(args[i + 1]))
@@ -79,8 +86,17 @@ public class Program
                 }
             }
 
+            // If we're specifying a recursive folder translation...
+            if (IsValidArg(args[i], "-recursive")
+                || IsValidArg(args[i], "-r"))
+            {
+                // Set the recursive variable to true
+                recursive = true;
+            }
+
             // If we're specifying a version...
-            if (IsValidArg(args[i], "-version"))
+            if (IsValidArg(args[i], "-version")
+                || IsValidArg(args[i], "-v"))
             {
                 if (IsValidArg(args[i + 1], "hla")) // Half-Life: Alyx
                 {
@@ -102,7 +118,8 @@ public class Program
             }
 
             // If we're specifying the file extension for our textures...
-            if (IsValidArg(args[i], "-fileextension"))
+            if (IsValidArg(args[i], "-fileextension")
+                || IsValidArg(args[i], "-fe"))
             {
                 if (IsValidArg(args[i + 1], "tga")) // TGA
                 {
@@ -144,7 +161,7 @@ public class Program
         // If the input folder is a valid directory...
         if (Directory.Exists(inputFolder))
         {
-            string[] files = Directory.GetFiles(inputFolder, "*.vmt", SearchOption.AllDirectories);
+            string[] files = Directory.GetFiles(inputFolder, "*.vmt", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             int fileCount = files.Length; // The total amount of files
             int errCount = 0; // The total amount of errors
 

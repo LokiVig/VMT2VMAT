@@ -5,13 +5,14 @@ It utilizes ![VTFCmd](https://github.com/NeilJed/VTFLib) to automatically turn i
 ## How To Use
 Using CMD you can launch the provided executable file with specified arguments. \
 Those arguments are:
-- "-input" - Specifies the path to a valid VMT file / folder of VMT files (recursive). (REQUIRED!)
-- "-output" - Specifies the path the resulting VMAT file(s) should be placed.
-- "-version" - Specifies which version of Source 2 we should translate to.
+- "-input" / "-i" - Specifies the path to a valid VMT file / folder of VMT files. (REQUIRED!)
+- "-output" / "-o" - Specifies the path the resulting VMAT file(s) should be placed.
+- "-recursive" / "-r" - Specifies whether we're enabling recursive folder translations.
+- "-version" / "-v" - Specifies which version of Source 2 we should translate to.
   - hla - Translates to a Half-Life: Alyx compatible VMAT file.
   - cs2 - Translates to a Counter-Strike 2 compatible VMAT file.
   - sbox - Translates to a s&box compatible VMAT file.
-- "-fileextension" - Specifies what filetype the textures should feature.
+- "-fileextension" / "-fe" - Specifies what filetype the textures should feature.
     - tga - Textures will be exported and specified as targa (TGA) files.
     - png - Textures will be exported and specified as PNG files.
     - jpg / jpeg - Textures will be exported and specified as JPG files.
