@@ -42,7 +42,6 @@ public class Program
     /// Does everything necessary to actually translate a VMT to a VMAT.
     /// </summary>
     /// <param name="args">The user's input arguments.</param>
-    [STAThread]
     public static void Main(string[] args)
     {
         // Check every argument
@@ -168,7 +167,7 @@ public class Program
 
             // Once we're done, log information
             Console.WriteLine("\nRecursive folder translation finished!");
-            Console.WriteLine($"{errCount} errors / {fileCount} files ({((float)errCount / fileCount) * 100:0.##}%)");
+            Console.WriteLine($"{errCount} errors / {fileCount} files ({(float)errCount / fileCount:P2})");
             Console.WriteLine(@$"Time to complete: {stopwatch.Elapsed:m\:ss\.fff}");
         }
         else if (IsValidVMT(inputFile)) // Otherwise, if we have a valid VMT file...
@@ -301,7 +300,6 @@ public class Program
                             break;
 
                         // If it's a texture...
-                        // We should prefix the path with "materials/", as well as add the specified file extension for the textures
                         case KeyValueType.Texture:
                             variables.Add(new Variable
                             {
@@ -332,7 +330,6 @@ public class Program
                             break;
 
                         // If it's a Vector2...
-                        // It's effectively an array of floats, parse it as such
                         case KeyValueType.Vector2:
                             variables.Add(new Variable
                             {
@@ -359,7 +356,6 @@ public class Program
                             break;
 
                         // If it's a Vector3...
-                        // It's effectively an array of floats, parse it as such
                         case KeyValueType.Vector3:
                             variables.Add(new Variable
                             {
