@@ -158,8 +158,13 @@ public class Program
             return;
         }
 
-        // If the input folder is a valid directory...
-        if (Directory.Exists(inputFolder))
+        // If we have a valid VMT file...
+        if (IsValidVMT(inputFile))
+        {
+            // Translate just this file
+            TranslateFile(inputFile);
+        }
+        else if (Directory.Exists(inputFolder)) // Otherwise, if the input folder is a valid directory...
         {
             string[] files = Directory.GetFiles(inputFolder, "*.vmt", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             int fileCount = files.Length; // The total amount of files
@@ -186,11 +191,6 @@ public class Program
             Console.WriteLine("\nRecursive folder translation finished!");
             Console.WriteLine($"{errCount} errors / {fileCount} files ({(float)errCount / fileCount:P2})");
             Console.WriteLine(@$"Time to complete: {stopwatch.Elapsed:m\:ss\.fff}");
-        }
-        else if (IsValidVMT(inputFile)) // Otherwise, if we have a valid VMT file...
-        {
-            // Translate just this file
-            TranslateFile(inputFile);
         }
     }
 
@@ -234,7 +234,7 @@ public class Program
 
             // Write some information beforehand
             sw.WriteLine("//");
-            sw.WriteLine("// THIS FILE WAS AUTOMATICALLY TRANSLATED THROUGH VMT2VMAT V.1.1");
+            sw.WriteLine("// THIS FILE WAS AUTOMATICALLY TRANSLATED THROUGH VMT2VMAT V.1.2");
             sw.WriteLine("// IF THERE ARE ANY ISSUES WITH THE PROVIDED TRANSLATION; CONTACT LOKI");
             sw.WriteLine("//");
             sw.WriteLine($"// INFO: TEXTURE FILE EXTENSION: \".{fileExtension}\", ENGINE VERSION: \"{version}\"");
@@ -394,8 +394,8 @@ public class Program
             }
 
             // If we are an overlay material, but there's no translucency...
-            if (variables.HasVariable(VariableType.Overlay) &&
-                !variables.HasVariable(VariableType.Alpha))
+            if (variables.HasVariable(VariableType.Overlay)
+                && !variables.HasVariable(VariableType.Alpha))
             {
                 variables.Add(new Variable
                 {
@@ -407,8 +407,8 @@ public class Program
                     Group = VariableGroup.Alpha
                 });
             }
-            else if (variables.HasVariable(VariableType.Overlay) && // BUT, if we have an overlay material and translucency is enabled...
-                variables.HasVariable(VariableType.Alpha))
+            else if (variables.HasVariable(VariableType.Overlay)  // BUT, if we have an overlay material and translucency is enabled...
+                && variables.HasVariable(VariableType.Alpha))
             {
                 // Remove the alpha variable and replace it with our blend mode
                 variables.RemoveVariable(VariableType.Alpha);
@@ -456,8 +456,8 @@ public class Program
             }
 
             // If we have a self-illum texture, but self-illum is not enabled...
-            if (variables.HasVariable(VariableType.SelfIllumTexture) &&
-                !variables.HasVariable(VariableType.SelfIllum))
+            if (variables.HasVariable(VariableType.SelfIllumTexture)
+                && !variables.HasVariable(VariableType.SelfIllum))
             {
                 variables.Add(new Variable
                 {
@@ -469,8 +469,8 @@ public class Program
                     Group = VariableGroup.SelfIllum
                 });
             }
-            else if (variables.HasVariable(VariableType.SelfIllum) && // BUT, if we have self-illum enabled, but no self-illum texture...
-                !variables.HasVariable(VariableType.SelfIllumTexture))
+            else if (variables.HasVariable(VariableType.SelfIllum) // BUT, if we have self-illum enabled, but no self-illum texture...
+                && !variables.HasVariable(VariableType.SelfIllumTexture))
             {
                 variables.Add(new Variable
                 {
