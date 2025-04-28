@@ -3,7 +3,7 @@
 public static class ListExtensions
 {
     /// <summary>
-    /// Determines if we have a desired texture type in the list of textures.
+    /// Determines if we have a desired variable type in the list of variables.
     /// </summary>
     /// <typeparam name="T">Should be <see cref="Variable"/>.</typeparam>
     /// <param name="list">This list.</param>
@@ -91,7 +91,7 @@ public static class ListExtensions
     /// </summary>
     /// <typeparam name="T">Should be <see cref="Variable"/>.</typeparam>
     /// <param name="list">This list.</param>
-    /// <param name="group">The desired group we wish to get variables from.</param>
+    /// <param name="group">The desired <see cref="VariableGroup"> we wish to get variables from.</param>
     /// <returns>An enumerable list of variables from the desired group.</returns>
     public static IEnumerable<T>? GetVariablesFromGroup<T>( this List<T> list, VariableGroup group )
         where T : Variable
@@ -106,7 +106,7 @@ public static class ListExtensions
     /// </summary>
     /// <typeparam name="T">Should be <see cref="Variable"/>.</typeparam>
     /// <param name="list">This list.</param>
-    /// <param name="varType">The type of the variable we should remove.</param>
+    /// <param name="varType">The <see cref="VariableType"> of the variable we should remove.</param>
     public static void RemoveVariable<T>(this List<T> list, VariableType varType)
         where T : Variable
     {

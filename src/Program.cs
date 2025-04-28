@@ -188,7 +188,7 @@ public class Program
             stopwatch.Stop();
 
             // Once we're done, log information
-            Console.WriteLine("\nRecursive folder translation finished!");
+            Console.WriteLine($"\n{(recursive ? "Recursive folder translation finished!" : "Folder translation finished!")}");
             Console.WriteLine($"{errCount} errors / {fileCount} files ({(float)errCount / fileCount:P2})");
             Console.WriteLine(@$"Time to complete: {stopwatch.Elapsed:m\:ss\.fff}");
         }
@@ -571,6 +571,9 @@ public class Program
                             break;
                     }
 
+                    // Sort the variables by their key
+                    groups[group] = groups[group].OrderBy(x => x.Key).ToList();
+
                     // Write its information to the VMAT file!
                     sw.WriteLine($"\t{variable.Key} {(!string.IsNullOrEmpty(variable.Value) ? $"\"{variable.Value}\"" : "")} {variable.Comment}");
 
@@ -908,7 +911,6 @@ public class Program
             case "player_control_clip":
             case "player":
                 return "player";
-
 
             // Small items
             // There's no direct translation for this...
