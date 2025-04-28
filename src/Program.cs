@@ -298,8 +298,6 @@ public class Program
                 // If we can translate the current keyword...
                 if (TranslateKeyValue(keyvalues[0], out string key, out KeyValueType keyType, out VariableType varType, out VariableGroup varGroup))
                 {
-                    // Check against different types of values we have
-
                     // Depending on the type of value we have...
                     switch (keyType)
                     {
