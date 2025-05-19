@@ -251,6 +251,7 @@ public class Program
 
                 // The two halves of a keyword, the key and the value
                 string[] keyvalues = line.Split(' ', '\t');
+                keyvalues = keyvalues.Where(kv => !string.IsNullOrEmpty(kv)).ToArray();
 
                 // For every value in the keyword...
                 for (int j = 0; j < keyvalues.Length; j++)
@@ -258,6 +259,13 @@ public class Program
                     keyvalues[j] = keyvalues[j].Replace("\"", ""); // Replace the quotes with nothing, we add quotes ourselves
                     keyvalues[j] = keyvalues[j].Replace("\\", "/"); // Replace backslashes with forward slashes
                     keyvalues[j] = keyvalues[j].ToLower(); // Make all the text lowercase
+                }
+
+                // If the array of keyvalues is empty...
+                if (keyvalues.Length == 0)
+                {
+                    // Go to the next line!
+                    continue;
                 }
 
                 // If we haven't already translated the shader...
@@ -671,6 +679,9 @@ public class Program
                 Console.Error.WriteLine("Invalid shader provided!");
                 vmatShader = "Invalid";
                 return false;
+
+            // Cable materials will work equally as well as a complex material
+            case "cable":
 
             // Unlit shader
             case "unlitgeneric":
