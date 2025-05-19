@@ -11,37 +11,37 @@ public class Program
     /// <summary>
     /// Which version of Source 2 we should parse to.
     /// </summary>
-    private static EngineVersion version = EngineVersion.HLA;
+    public static EngineVersion Version = EngineVersion.HLA;
 
     /// <summary>
     /// Which file type we should use for textures.
     /// </summary>
-    private static string fileExtension = "tga";
+    public static string FileExtension = "tga";
 
     /// <summary>
     /// The path to the VMT file we want to translate.
     /// </summary>
-    private static string inputFile = string.Empty;
+    public static string InputFile = string.Empty;
 
     /// <summary>
     /// The path to the VMAT file we want to translate.
     /// </summary>
-    private static string outputFile = string.Empty;
+    public static string OutputFile = string.Empty;
 
     /// <summary>
     /// Path to a folder we should use for bulk-translation.
     /// </summary>
-    private static string inputFolder = string.Empty;
+    public static string InputFolder = string.Empty;
 
     /// <summary>
     /// Path to a folder we should use to save the translated files to.
     /// </summary>
-    private static string outputFolder = string.Empty;
+    public static string OutputFolder = string.Empty;
 
     /// <summary>
     /// Determines if folder translation is recursive or not.
     /// </summary>
-    private static bool recursive = false;
+    public static bool Recursive = false;
 
     /// <summary>
     /// Does everything necessary to actually translate a VMT to a VMAT.
@@ -60,12 +60,12 @@ public class Program
                 if (Path.HasExtension(args[i + 1]))
                 {
                     // Only translate the lone file!
-                    inputFile = args[i + 1];
+                    InputFile = args[i + 1];
                 }
                 else // Otherwise...
                 {
                     // We're specifying a folder!
-                    inputFolder = args[i + 1];
+                    InputFolder = args[i + 1];
                 }
             }
 
@@ -77,12 +77,12 @@ public class Program
                 if (Path.HasExtension(args[i + 1]))
                 {
                     // Only translate the lone file!
-                    outputFile = args[i + 1];
+                    OutputFile = args[i + 1];
                 }
                 else // Otherwise...
                 {
                     // We're specifying a folder!
-                    outputFolder = args[i + 1];
+                    OutputFolder = args[i + 1];
                 }
             }
 
@@ -91,7 +91,7 @@ public class Program
                 || IsValidArg(args[i], "-r"))
             {
                 // Set the recursive variable to true
-                recursive = true;
+                Recursive = true;
             }
 
             // If we're specifying a version...
@@ -100,20 +100,20 @@ public class Program
             {
                 if (IsValidArg(args[i + 1], "hla")) // Half-Life: Alyx
                 {
-                    version = EngineVersion.HLA;
+                    Version = EngineVersion.HLA;
                 }
                 else if (IsValidArg(args[i + 1], "cs2")) // Counter Strike 2
                 {
-                    version = EngineVersion.CS2;
+                    Version = EngineVersion.CS2;
                 }
                 else if (IsValidArg(args[i + 1], "sbox")) // s&box
                 {
-                    version = EngineVersion.Sandbox;
+                    Version = EngineVersion.Sandbox;
                 }
                 else // Assume invalid input! Default to HL:A
                 {
                     Console.Error.WriteLine("Invalid Source 2 version provided! Defaulting to HLA...");
-                    version = EngineVersion.HLA;
+                    Version = EngineVersion.HLA;
                 }
             }
 
@@ -123,27 +123,27 @@ public class Program
             {
                 if (IsValidArg(args[i + 1], "tga")) // TGA
                 {
-                    fileExtension = "tga";
+                    FileExtension = "tga";
                 }
                 else if (IsValidArg(args[i + 1], "png")) // PNG
                 {
-                    fileExtension = "png";
+                    FileExtension = "png";
                 }
                 else if (IsValidArg(args[i + 1], "jpg")
                     || IsValidArg(args[i + 1], "jpeg")) // JPG
                 {
-                    fileExtension = "jpg";
+                    FileExtension = "jpg";
                 }
                 else // Assume invalid input! Default to TGA
                 {
                     Console.Error.WriteLine("Invalid file extension provided! Defaulting to TGA...");
-                    fileExtension = "tga";
+                    FileExtension = "tga";
                 }
             }
         }
 
         // If we're passing a VMT file and a folder...
-        if (!string.IsNullOrEmpty(inputFile) && !string.IsNullOrEmpty(inputFolder))
+        if (!string.IsNullOrEmpty(InputFile) && !string.IsNullOrEmpty(InputFolder))
         {
             // Tell the user it's not possible!
             Console.Error.WriteLine("Can't specify a VMT path AND folder!");
@@ -151,7 +151,7 @@ public class Program
         }
 
         // Check if the provided path to a VMT is valid...
-        if (!IsValidVMT(inputFile) && !Directory.Exists(inputFolder))
+        if (!IsValidVMT(InputFile) && !Directory.Exists(InputFolder))
         {
             // If not, whoopsie!
             Console.Error.WriteLine("Invalid VMT file / folder given!");
@@ -159,14 +159,14 @@ public class Program
         }
 
         // If we have a valid VMT file...
-        if (IsValidVMT(inputFile))
+        if (IsValidVMT(InputFile))
         {
             // Translate just this file
-            TranslateFile(inputFile);
+            TranslateFile(InputFile);
         }
-        else if (Directory.Exists(inputFolder)) // Otherwise, if the input folder is a valid directory...
+        else if (Directory.Exists(InputFolder)) // Otherwise, if the input folder is a valid directory...
         {
-            string[] files = Directory.GetFiles(inputFolder, "*.vmt", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+            string[] files = Directory.GetFiles(InputFolder, "*.vmt", Recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             int fileCount = files.Length; // The total amount of files
             int errCount = 0; // The total amount of errors
 
@@ -188,7 +188,7 @@ public class Program
             stopwatch.Stop();
 
             // Once we're done, log information
-            Console.WriteLine($"\n{(recursive ? "Recursive folder translation finished!" : "Folder translation finished!")}");
+            Console.WriteLine($"\n{(Recursive ? "Recursive folder translation finished!" : "Folder translation finished!")}");
             Console.WriteLine($"{errCount} errors / {fileCount} files ({(float)errCount / fileCount:P2})");
             Console.WriteLine(@$"Time to complete: {stopwatch.Elapsed:m\:ss\.fff}");
         }
@@ -207,27 +207,27 @@ public class Program
         // Log general information
         Console.WriteLine($"\nFile to translate: \"{path}\"");
         Console.WriteLine($"Output file: \"{path}\"");
-        Console.WriteLine($"Source 2 version: {version}");
-        Console.WriteLine($"File extension: \".{fileExtension}\"\n");
+        Console.WriteLine($"Source 2 version: {Version}");
+        Console.WriteLine($"File extension: \".{FileExtension}\"\n");
         Console.WriteLine("Translating VMT to VMAT...\n");
 
         // Set the VMAT path, if it isn't already specified...
-        if (string.IsNullOrEmpty(outputFile) || string.IsNullOrEmpty(outputFolder))
+        if (string.IsNullOrEmpty(OutputFile) || string.IsNullOrEmpty(OutputFolder))
         {
             // Copy the VMT's path and filename, but change the extension to .vmat
-            outputFile = Path.ChangeExtension(path, ".vmat");
+            OutputFile = Path.ChangeExtension(path, ".vmat");
         }
-        else if (!string.IsNullOrEmpty(outputFolder)) // Otherwise, if we've specified a folder...
+        else if (!string.IsNullOrEmpty(OutputFolder)) // Otherwise, if we've specified a folder...
         {
             // Make sure the folder exists
-            Directory.CreateDirectory(Path.Combine(outputFolder, Path.GetDirectoryName(path) ?? string.Empty));
+            Directory.CreateDirectory(Path.Combine(OutputFolder, Path.GetDirectoryName(path) ?? string.Empty));
 
             // Set the output file's path
-            outputFile = Path.Combine(outputFolder, Path.ChangeExtension(Path.GetFileName(path), ".vmat"));
+            OutputFile = Path.Combine(OutputFolder, Path.ChangeExtension(Path.GetFileName(path), ".vmat"));
         }
 
         // Create a file at the path of the VMAT and start writing to it
-        using (StreamWriter sw = new StreamWriter(File.Create(outputFile)))
+        using (StreamWriter sw = new StreamWriter(File.Create(OutputFile)))
         {
             // All of the lines in the VMT file
             string[] lines = File.ReadAllLines(path);
@@ -237,7 +237,7 @@ public class Program
             sw.WriteLine("// THIS FILE WAS AUTOMATICALLY TRANSLATED THROUGH VMT2VMAT V.1.2");
             sw.WriteLine("// IF THERE ARE ANY ISSUES WITH THE PROVIDED TRANSLATION; CONTACT LOKI");
             sw.WriteLine("//");
-            sw.WriteLine($"// INFO: TEXTURE FILE EXTENSION: \".{fileExtension}\", ENGINE VERSION: \"{version}\"");
+            sw.WriteLine($"// INFO: TEXTURE FILE EXTENSION: \".{FileExtension}\", ENGINE VERSION: \"{Version}\"");
             sw.WriteLine("//");
             sw.WriteLine("");
             sw.WriteLine("Layer0");
@@ -319,7 +319,7 @@ public class Program
                             variables.Add(new Variable
                             {
                                 Key = key,
-                                Value = $"materials/{keyvalues[1]}.{fileExtension}",
+                                Value = $"materials/{keyvalues[1]}.{FileExtension}",
                                 Comment = $"// {line}",
                                 VmtKeyValue = $"{keyvalues[0]} {keyvalues[1]}",
                                 Type = varType,
@@ -429,7 +429,7 @@ public class Program
                 variables.Add(new Variable
                 {
                     Key = "TextureTranslucency",
-                    Value = variables.GetVariable("TextureColor")?.Value.Replace($".{fileExtension}", $"_trans.{fileExtension}") ?? "INVALID",
+                    Value = variables.GetVariable("TextureColor")?.Value.Replace($".{FileExtension}", $"_trans.{FileExtension}") ?? "INVALID",
                     Comment = "// AUTOGENERATED FROM COLOR TEXTURE",
                     VmtKeyValue = "AUTOGENERATED",
                     Type = VariableType.AlphaTexture,
@@ -473,7 +473,7 @@ public class Program
                 variables.Add(new Variable
                 {
                     Key = "TextureSelfIllum",
-                    Value = variables.GetVariable("TextureColor")!.Value.Replace($".{fileExtension}", $"_selfillum.{fileExtension}"),
+                    Value = variables.GetVariable("TextureColor")!.Value.Replace($".{FileExtension}", $"_selfillum.{FileExtension}"),
                     Comment = "// AUTOGENERATED FROM COLOR TEXTURE",
                     VmtKeyValue = "AUTOGENERATED",
                     Type = VariableType.SelfIllumTexture,
@@ -486,7 +486,7 @@ public class Program
                 && variables.HasVariable(VariableType.Overlay))
             {
                 // Change the shader to the static overlay shader
-                switch (version)
+                switch (Version)
                 {
                     default:
                     case EngineVersion.HLA:
@@ -589,7 +589,7 @@ public class Program
         }
 
         // Log that we're now converting VTFs
-        Console.WriteLine($"\nConverting VTFs to {fileExtension.ToUpper()}s...\n");
+        Console.WriteLine($"\nConverting VTFs to {FileExtension.ToUpper()}s...\n");
 
         // Convert our VTFs using VTFEdit to the preferred file extension
         for (int i = 0; i < texturePaths.Count; i++)
@@ -618,17 +618,17 @@ public class Program
             }
 
             // If there's not already a converted file with the same name / path...
-            if (!File.Exists(Path.ChangeExtension(vtfPath, fileExtension)))
+            if (!File.Exists(Path.ChangeExtension(vtfPath, FileExtension)))
             {
                 // Create an instance of VTFCMD to convert the VTF to our desired file extension
                 Process? vtfCmd = Process.Start(new ProcessStartInfo()
                 {
                     FileName = "VTFCmd.exe",
-                    Arguments = $"-file \"{vtfPath}\" -exportformat \"{fileExtension}\" -format \"RGB888\" -silent"
+                    Arguments = $"-file \"{vtfPath}\" -exportformat \"{FileExtension}\" -format \"RGB888\" -silent"
                 });
 
                 // Log our conversion!
-                Console.WriteLine($"\"{Path.GetFileName(vtfPath)}\" -> \"{Path.GetFileName(Path.ChangeExtension(vtfPath, fileExtension))}\"");
+                Console.WriteLine($"\"{Path.GetFileName(vtfPath)}\" -> \"{Path.GetFileName(Path.ChangeExtension(vtfPath, FileExtension))}\"");
             }
         }
 
@@ -680,7 +680,7 @@ public class Program
 
             // LightmappedGeneric, used for brushes / static objects
             case "lightmappedgeneric":
-                switch (version)
+                switch (Version)
                 {
                     // In HL:A it's known as "VR Complex"
                     default:
@@ -702,7 +702,7 @@ public class Program
 
             // Per-pixel 2-way blend
             case "worldvertextransition":
-                switch (version)
+                switch (Version)
                 {
                     // In HL:A it's known as "VR Simple 2way Blend"
                     default:
@@ -715,7 +715,7 @@ public class Program
             // Refracting shader
             // AFAIK does NOT exist in HL:A
             case "refract":
-                switch (version)
+                switch (Version)
                 {
                     default:
                     case EngineVersion.HLA:
@@ -920,7 +920,7 @@ public class Program
 
             // Concrete surface property
             case "concrete":
-                switch (version)
+                switch (Version)
                 {
                     default:
                     case EngineVersion.HLA:
@@ -933,7 +933,7 @@ public class Program
 
             // Small concrete cinder blocks
             case "concrete_block":
-                switch (version)
+                switch (Version)
                 {
                     default:
                     case EngineVersion.HLA:
@@ -946,7 +946,7 @@ public class Program
 
             // Bricks! Self explanatory
             case "brick":
-                switch (version)
+                switch (Version)
                 {
                     default:
                     case EngineVersion.HLA:
@@ -959,7 +959,7 @@ public class Program
 
             // Gravelous grounds
             case "gravel":
-                switch (version)
+                switch (Version)
                 {
                     default:
                     case EngineVersion.HLA:
@@ -972,7 +972,7 @@ public class Program
 
             // Small, solid rocks
             case "rock":
-                switch (version)
+                switch (Version)
                 {
                     default:
                     case EngineVersion.HLA:
@@ -985,7 +985,7 @@ public class Program
 
             // Wood ladder, no direct translation, regular wood properties
             case "woodladder":
-                switch (version)
+                switch (Version)
                 {
                     default:
                     case EngineVersion.HLA:
@@ -998,7 +998,7 @@ public class Program
 
             // Metal surface property
             case "metal":
-                switch (version)
+                switch (Version)
                 {
                     default:
                     case EngineVersion.HLA:
@@ -1055,82 +1055,82 @@ public class Program
     {
         return input.Equals(validArg, StringComparison.OrdinalIgnoreCase);
     }
+}
+
+/// <summary>
+/// The different versions of Source 2 to handle.<br/>
+/// Each of them have slight differences in e.g. shaders, this lets us easily switch between them.
+/// </summary>
+public enum EngineVersion
+{
+    /// <summary>
+    /// Half-Life: Alyx.
+    /// </summary>
+    HLA,
 
     /// <summary>
-    /// The different versions of Source 2 to handle.<br/>
-    /// Each of them have slight differences in e.g. shaders, this lets us easily switch between them.
+    /// Counter-Strike 2.
     /// </summary>
-    private enum EngineVersion
-    {
-        /// <summary>
-        /// Half-Life: Alyx.
-        /// </summary>
-        HLA,
-
-        /// <summary>
-        /// Counter-Strike 2.
-        /// </summary>
-        CS2,
-
-        /// <summary>
-        /// s&box.
-        /// </summary>
-        Sandbox
-    }
+    CS2,
 
     /// <summary>
-    /// The different type of values a keyword can hold
+    /// s&box.
     /// </summary>
-    private enum KeyValueType
-    {
-        /// <summary>
-        /// An unknown keyvalue.
-        /// </summary>
-        Unknown,
+    Sandbox
+}
 
-        /// <summary>
-        /// A texture keyvalue.
-        /// </summary>
-        Texture,
+/// <summary>
+/// The different type of values a keyword can hold
+/// </summary>
+public enum KeyValueType
+{
+    /// <summary>
+    /// An unknown keyvalue.
+    /// </summary>
+    Unknown,
 
-        /// <summary>
-        /// A keyvalue that's purely text.
-        /// </summary>
-        Text,
+    /// <summary>
+    /// A texture keyvalue.
+    /// </summary>
+    Texture,
 
-        /// <summary>
-        /// A keyvalue that's any sort of number, float or integer.
-        /// </summary>
-        Number,
+    /// <summary>
+    /// A keyvalue that's purely text.
+    /// </summary>
+    Text,
 
-        /// <summary>
-        /// A keyvalue with 2 numbers in one array.
-        /// </summary>
-        Vector2,
+    /// <summary>
+    /// A keyvalue that's any sort of number, float or integer.
+    /// </summary>
+    Number,
 
-        /// <summary>
-        /// A keyvalue with 2 numbers in one array, of which both are the same.
-        /// </summary>
-        SameValueV2,
+    /// <summary>
+    /// A keyvalue with 2 numbers in one array.
+    /// </summary>
+    Vector2,
 
-        /// <summary>
-        /// A keyvalue with 3 numbers in one array.
-        /// </summary>
-        Vector3,
+    /// <summary>
+    /// A keyvalue with 2 numbers in one array, of which both are the same.
+    /// </summary>
+    SameValueV2,
 
-        /// <summary>
-        /// A keyvalue with 3 numbers in one array, of which all are the same.
-        /// </summary>
-        SameValueV3,
+    /// <summary>
+    /// A keyvalue with 3 numbers in one array.
+    /// </summary>
+    Vector3,
 
-        /// <summary>
-        /// A keyvalue with 4 numbers in one array.
-        /// </summary>
-        Vector4,
+    /// <summary>
+    /// A keyvalue with 3 numbers in one array, of which all are the same.
+    /// </summary>
+    SameValueV3,
 
-        /// <summary>
-        /// A keyvalue with 4 numbers in one array, of which all are the same.
-        /// </summary>
-        SameValueV4
-    }
+    /// <summary>
+    /// A keyvalue with 4 numbers in one array.
+    /// </summary>
+    Vector4,
+
+    /// <summary>
+    /// A keyvalue with 4 numbers in one array, of which all are the same.
+    /// </summary>
+    SameValueV4
 }
