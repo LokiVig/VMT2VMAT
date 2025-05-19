@@ -173,16 +173,16 @@ public class Program
             // Start a new stopwatch, we need to record just how long it takes to do this!
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            // For every file in this folder and all recursive folders...
-            Parallel.ForEach(files, file =>
+            // For every file in the specified folders...
+            foreach (string file in files)
             {
                 // If it can't translate the current file...
                 if (!TranslateFile(file))
                 {
                     // Increase the amount of errors!
-                    Interlocked.Increment(ref errCount);
+                    errCount++;
                 }
-            });
+            }
 
             // Stop the stopwatch! We've done it all
             stopwatch.Stop();
@@ -203,13 +203,6 @@ public class Program
         // Variables
         List<Variable> variables = new List<Variable>(); // List of VMAT translated variables
         List<string> texturePaths = new List<string>(); // List of VTF files this VMT references
-
-        // Log general information
-        Console.WriteLine($"\nFile to translate: \"{path}\"");
-        Console.WriteLine($"Output file: \"{path}\"");
-        Console.WriteLine($"Source 2 version: {Version}");
-        Console.WriteLine($"File extension: \".{FileExtension}\"\n");
-        Console.WriteLine("Translating VMT to VMAT...\n");
 
         // Set the VMAT path, if it isn't already specified...
         if (string.IsNullOrEmpty(OutputFile) || string.IsNullOrEmpty(OutputFolder))
